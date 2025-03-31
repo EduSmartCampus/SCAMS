@@ -1,0 +1,29 @@
+.room {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 5px 10px;
+    background-color: #eeeeee;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: none;
+
+    .room-name {
+        font-size: 1.1rem;
+    }
+
+    .book {
+        padding: 5px 15px;
+        border-radius: 20px;
+        border: none;
+        background-color: #005FE6;
+        color: #fff;
+        font-size: 1rem;
+
+        &:hover {
+            cursor: pointer;
+            background-color: #00429f;
+        }
+    }
+
+}

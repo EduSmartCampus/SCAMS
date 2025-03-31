@@ -1,8 +1,11 @@
+import BodyHome from "../components/Home/BodyHome";
+import HeaderHome from "../components/Home/HeaderHome";
+
 const Home = () => {
     return (
         <div>
-            <h1>Home</h1>
-            <p>Esta es la pagina de inicio</p>
+            <HeaderHome />
+            <BodyHome />
         </div>
     );
 }

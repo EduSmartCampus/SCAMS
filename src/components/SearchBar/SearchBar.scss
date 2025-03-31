@@ -1,0 +1,89 @@
+$border-color: #cccccc;
+$hover-color: #007bff;
+$border-radius: 8px;
+
+@mixin inputStyles {
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    padding: 5px;
+    outline: none;
+    font-size: 1rem;
+
+    &:hover {
+        border-color: $hover-color;
+        cursor: pointer;
+    }
+}
+
+.search-room {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    
+    .search-form {
+        display: flex;
+        gap: 10px;
+        flex: 1;
+    
+        #room {
+            @include inputStyles;
+            text-align: center;
+            flex: 1;
+        }
+    
+        input {
+            @include inputStyles;
+            flex: 1;
+        }
+    }
+
+    .search-button {
+        display: block;
+        width: 150px;
+        font-size: 1rem;
+        background: linear-gradient(to left, #0a75ad, #75acd5);
+        color: #fff;
+        padding: 7px 10px;
+        border-radius: 20px;
+        border: none;
+        position: relative;
+
+        .search-icon {
+            position: absolute;
+            border-radius: 50%;
+            padding: 2px;
+            background-color: #fff;
+            color: #000;
+            top: 4.5px;
+            left: 6px;
+        }
+
+        p {
+            font-weight: 500;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    @media (max-width: 740px) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .search-form {
+            width: 100%;
+        }
+
+        .search-button {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .search-form {
+            flex-direction: column;
+        }
+    }
+}
