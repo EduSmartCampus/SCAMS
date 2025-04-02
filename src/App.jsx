@@ -4,6 +4,7 @@ import Layout from './Layout/Layout'
 import Home from './pages/Home'
 import Setting from './pages/Setting'
 import Login from './pages/Login'
+import RoomInformation from './pages/RoomInformation'
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="/setting" element={<Setting />} />
+          <Route path='/room/:id' element={<RoomInformation />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>

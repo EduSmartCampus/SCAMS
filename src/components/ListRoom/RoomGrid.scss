@@ -1,0 +1,18 @@
+.room-grid {
+    display: block;
+    text-align: center;
+    background-color: #eeddda;
+    text-decoration: none;
+    padding: 15px;
+    width: 100px;
+    transition: 0.3s ease all;
+
+    p {
+        color: #000;
+    }
+
+    &:hover{
+        background-color: #d1c2bf;
+        cursor: pointer;
+    }
+}

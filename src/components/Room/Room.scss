@@ -4,12 +4,13 @@
     justify-content: space-between;
     height: 40px;
     padding: 5px 10px;
-    background-color: #eeeeee;
+    background-color: #dcdada;
     transition: background-color 0.3s ease, transform 0.2s ease;
     border: none;
 
     .room-name {
         font-size: 1.1rem;
+        font-weight: 600;
     }
 
     .book {
@@ -19,6 +20,7 @@
         background-color: #005FE6;
         color: #fff;
         font-size: 1rem;
+        transition: 0.3s ease all;
 
         &:hover {
             cursor: pointer;
@@ -26,4 +28,21 @@
         }
     }
 
+}
+
+.info {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 20px;
+    padding: 10px;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    border-color: #dcdada;
+    overflow: auto;
+
+    span {
+        font-weight: 500;
+    }
 }

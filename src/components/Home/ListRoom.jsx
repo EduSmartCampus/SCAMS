@@ -1,14 +1,8 @@
-import { useState } from "react";
-import "./SearchBar.scss";
-import Selection from "./Selection";
-import SearchIcon from '@mui/icons-material/Search';
-import { useNavigate } from "react-router-dom";
+import "./ListRoom.scss";
+import Grid from "@mui/material/Grid";
+import RoomGrid from "../ListRoom/RoomGrid";
 
-const SearchBar = () => {
-  const [selectedRoom, setSelectedRoom] = useState("B1-201");
-  const [selectedDate, setSelectedDate] = useState("");
-  const navigate = useNavigate();
-
+const ListRoom = () => {
   const rooms = [
     {
       id: "B1-201",
@@ -92,30 +86,20 @@ const SearchBar = () => {
     },
   ];
 
-  const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
-  };
-
-  const handleSearch = () => {
-    if (!selectedDate) {
-      alert("Please select a date.");
-      return;
-    }
-    navigate(`/room/${selectedRoom}`);
-  };
-
   return (
-    <div className="search-room">
-      <div className="search-form">
-        <Selection options={rooms} id="room" onChange={setSelectedRoom} />
-        <input type="date" value={selectedDate} onChange={handleDateChange} />
+    <div className="list">
+      <h1>List of rooms</h1>
+      <div className="room-list">
+        <Grid spacing={1} container justifyContent="center">
+          {rooms.map((room) => (
+            <Grid key={room.id} xs={12} sm={6} md={4} lg={3}>
+              <RoomGrid room={room} />
+            </Grid>
+          ))}
+        </Grid>
       </div>
-      <button className="search-button" onClick={handleSearch}>
-        <SearchIcon className="search-icon" />
-        <p>Search</p>
-      </button>
     </div>
   );
 };
 
-export default SearchBar;
+export default ListRoom;
