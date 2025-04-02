@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`🚀 Server listening on http://localhost:${PORT}`);
+	console.log(`Server listening on http://localhost:${PORT}`);
 });
 const Room = require("./models/Room");
 
