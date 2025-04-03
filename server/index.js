@@ -17,8 +17,8 @@ mongoose
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
-	.then(() => console.log("✅ MongoDB connected"))
-	.catch((err) => console.error("❌ MongoDB connection error:", err));
+	.then(() => console.log("MongoDB connected"))
+	.catch((err) => console.error("MongoDB connection error:", err));
 
 // Sample route
 app.get("/", (req, res) => {
@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`🚀 Server listening on http://localhost:${PORT}`);
+	console.log(`Server listening on http://localhost:${PORT}`);
 });
 const Room = require("./models/Room");
 
