@@ -1,16 +1,21 @@
-const Login = () => {
+// src/App.jsx
+import LoginCombine from '../components/Login/LoginCombine.jsx';
+
+function Login() {
+
+
     return (
-        <div>
-            <h1>Login</h1>
-            <form>
-                <label htmlFor="email">Email</label>
-                <input type="email" name="email" id="email" />
-                <label htmlFor="password">Password</label>
-                <input type="password" name="password" id="password" />
-                <button type="submit">Login</button>
-            </form>
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            background: 'linear-gradient(to right, #d1dbf1, #aac7fa)',
+            padding: '20px'
+        }}>
+            <LoginCombine />
         </div>
-    )
+    );
 }
 
 export default Login;
