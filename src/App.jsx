@@ -6,6 +6,7 @@ import Setting from './pages/Setting';
 import Login from './pages/Login';
 import RoomInformation from './pages/RoomInformation';
 import ScheduleRegistration from './pages/ScheduleRegistration';
+import UserInfo from './pages/UserInfo.jsx'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path='/schedule-registration' element={<ScheduleRegistration />} />
         </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/userinfo" element={<UserInfo />} />
       </Routes>
     </BrowserRouter>
   );

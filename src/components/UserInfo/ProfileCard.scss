@@ -1,0 +1,33 @@
+:root {
+  --primary-color: #649fe5;
+  --secondary-color: #3273ff;
+  --success-color: #4cc9f0;
+  --danger-color: #e34f4f;
+  --warning-color: #52b773;
+  --light-color: #f8f9fa;
+  --dark-color: #212529;
+  --gray-color: #6c757d;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.profile-card {
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 700px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .profile-card {
+    max-width: 100%;
+  }
+}
