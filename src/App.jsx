@@ -14,12 +14,11 @@ function App() {
       <Routes>
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="/setting" element={<Setting />} />
+          <Route path="/setting" element={<UserInfo />} />
           <Route path='/room/:id' element={<RoomInformation />} />
           <Route path='/schedule-registration' element={<ScheduleRegistration />} />
         </Route>
         <Route path="/login" element={<Login />} />
-        <Route path="/userinfo" element={<UserInfo />} />
       </Routes>
     </BrowserRouter>
   );

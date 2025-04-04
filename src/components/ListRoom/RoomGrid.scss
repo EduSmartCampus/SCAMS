@@ -13,6 +13,30 @@
 
     &:hover{
         background-color: #d1c2bf;
+        animation: moveup 0.5s ease forwards;
         cursor: pointer;
     }
+
+    &:not(:hover) {
+        animation: movedown 0.5s ease forwards;
+    }
+
+    @keyframes moveup {
+        0% {
+            transform: translateY(0);
+        }
+        100% {
+            transform: translateY(-5px);
+        }
+    }
+
+    @keyframes movedown {
+        0% {
+            transform: translateY(-5px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+
 }

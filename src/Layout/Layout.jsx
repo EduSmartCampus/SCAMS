@@ -5,12 +5,14 @@ import HeaderHome from '../components/Home/HeaderHome';
 
 const Layout = () => {
   const location = useLocation();
+  const isRoomPage = location.pathname.startsWith('/room/');
 
   return (
     <main className="layout">
       <SideNav />
       <div className="outlet-container">
         {location.pathname === '/' && <HeaderHome />}
+        {isRoomPage && <HeaderHome />}
         <Outlet />
       </div>
     </main>

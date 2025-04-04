@@ -1,10 +1,24 @@
+import { useNavigate } from 'react-router-dom';
 // src/components/AuthForm/AuthForm.jsx
 import './AuthForm.scss'; // Import file SCSS thông thường
 
 const AuthForm = ({ isSignUp }) => {
+    const navigate = useNavigate();
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const form = event.target;
+        if (form.checkValidity()) {
+            navigate('/');
+        } else {
+            form.reportValidity();
+        }
+    };
+
     return (
         <div className={`form-container ${isSignUp ? 'sign-up' : 'sign-in'}`}>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <h1>{isSignUp ? "Create Account" : "Sign In"}</h1>
                 <div className="social-icons">
                     <a href="#" className="icon">
