@@ -6,10 +6,27 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const SECRET_KEY = process.env.JWT_SECRET;
+
+//used controllers
+const { login } = require('./controllers/auth.controller');
+
+//import auth middleware
+const { authMiddleware } = require('./middlewares/auth.middleware');
+
+//import model
+const Room = require("./models/Room");
+
+//import routes
+const roomRoutes = require('./routes/room.routes');
+
+
+
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
 
 // Connect to MongoDB
 mongoose
@@ -20,17 +37,28 @@ mongoose
 	.then(() => console.log("MongoDB connected"))
 	.catch((err) => console.error("MongoDB connection error:", err));
 
+
+app.listen(PORT, () => {
+	console.log(`Server listening on http://localhost:${PORT}`);
+});
+
+
+
 // Sample route
 app.get("/", (req, res) => {
 	res.send("SCAMS Backend is running!");
 });
 
-app.listen(PORT, () => {
-	console.log(`Server listening on http://localhost:${PORT}`);
-});
-const Room = require("./models/Room");
 
-app.get("/api/rooms", async (req, res) => {
+app.post('/login', login);
+
+// app.use('/room', roomRoutes); 
+// vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại 
+// và phần endpoint còn lại mng vô routes/room.routes.js viết 
+
+
+
+app.get("/api/rooms", authMiddleware, async (req, res) => {
 	try {
 		const rooms = await Room.find();
 		res.json(rooms);
@@ -38,3 +66,4 @@ app.get("/api/rooms", async (req, res) => {
 		res.status(500).json({ error: "Lỗi lấy danh sách phòng" });
 	}
 });
+
