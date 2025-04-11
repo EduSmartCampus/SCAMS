@@ -3,6 +3,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const redis = require('./redisClient');
+
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+
 require("dotenv").config();
 
 const app = express();
@@ -39,7 +44,11 @@ mongoose
 
 app.listen(PORT, () => {
 	console.log(`Server listening on http://localhost:${PORT}`);
+	console.log(`View API docs at http://localhost:${PORT}/api-docs`);
 });
+
+// Route Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Test
 redis.get("greeting").then(result => {
