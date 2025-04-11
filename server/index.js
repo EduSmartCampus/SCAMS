@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const redis = require('./redisClient');
 require("dotenv").config();
 
 const app = express();
@@ -21,8 +22,6 @@ const Room = require("./models/Room");
 const roomRoutes = require('./routes/room.routes');
 
 
-
-
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -40,6 +39,11 @@ mongoose
 
 app.listen(PORT, () => {
 	console.log(`Server listening on http://localhost:${PORT}`);
+});
+
+// Test
+redis.get("greeting").then(result => {
+	console.log("Redis test:", result);
 });
 
 
