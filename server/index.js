@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 const SECRET_KEY = process.env.JWT_SECRET;
 
 //used controllers
-const { login } = require('./controllers/auth.controller');
+const { login, changePassword, signup } = require('./controllers/auth.controller');
 
 //import auth middleware
 const { authMiddleware } = require('./middlewares/auth.middleware');
@@ -51,6 +51,10 @@ app.get("/", (req, res) => {
 
 
 app.post('/login', login);
+
+app.post('/signup', signup);
+
+app.post("/changePassword", changePassword)
 
 // app.use('/room', roomRoutes); 
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại 
