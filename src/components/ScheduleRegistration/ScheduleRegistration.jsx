@@ -21,62 +21,38 @@ const ScheduleRegistration = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    try {
+      const bookingData = {
+        room_id: parseInt(roomId),
+        date: selectedDate,
+        start_time: startTime,
+        end_time: endTime,
+        lecturer: user ? user.username : "Guest",
+        subject: subject,
+      };
 
-    // try {
-    //   const response = await fetch(
-    //     `http://your-backend-url/schedule?room_id=${roomId}&date=${date}`,
-    //     {
-    //       method: "GET",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   );
-    //   const scheduleData = await response.json();
+      const response = await fetch("", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
 
-    //   if (response.ok) {
-    //     const slot = scheduleData.find((s) => s.hour === hourNum);
-    //     if (slot && slot.occupied) {
-    //       setError("This room is already booked at the selected time.");
-    //       return;
-    //     }
-    //   } else {
-    //     setError("Failed to check room availability.");
-    //     return;
-    //   }
-    // } catch (err) {
-    //   setError("An error occurred while checking room availability.");
-    //   return;
-    // }
-
-    // try {
-    //   const bookingData = {
-    //     room_id: parseInt(roomId),
-    //     date: date,
-    //     hour: hourNum,
-    //     occupied: true,
-    //     lecturer: user ? user.username : "Guest",
-    //     subject: subject,
-    //   };
-
-    //   const response = await fetch("http://your-backend-url/schedule", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(bookingData),
-    //   });
-
-    //   if (response.ok) {
-    //     setSuccess(
-    //       `Room booked successfully for ${subject} on ${date} at ${hour}:00!`
-    //     );
-    //   } else {
-    //     setError("Failed to book the room. Please try again.");
-    //   }
-    // } catch (err) {
-    //   setError("An error occurred. Please try again.");
-    // }
+      if (response.ok) {
+        setSuccess(
+          `Room booked successfully for ${subject} on ${selectedDate} from ${startTime} to ${endTime}!`
+        );
+        setTimeout(() => {
+          toggleSchedule();
+        }, 2000);
+      } else {
+        setError("Failed to book the room. Please try again.");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    }
+    
   };
 
   const handleDateChange = (event) => {
