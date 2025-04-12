@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: My Node API
+  version: 1.0.0
+  description: API mô tả bằng Swagger
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /hello:
+    get:
+      summary: Trả về lời chào
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /login:
+    post:
+      summary: Đăng nhập người dùng
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "sv001"
+                password:
+                  type: string
+                  example: "123456"
+                type:
+                  type: string
+                  enum: [lecturer, student]
+                  example: "student"
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Sai thông tin đăng nhập
+
+  /signup:
+    post:
+      summary: Đăng ký tài khoản mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Nguyen Van A"
+                email:
+                  type: string
+                  example: "a@student.edu"
+                password:
+                  type: string
+                  example: "123456"
+                type:
+                  type: string
+                  enum: [lecturer, student]
+                  example: "student"
+                id:
+                  type: integer
+                  example: 101
+      responses:
+        '201':
+          description: Đăng ký thành công
+        '400':
+          description: Email đã tồn tại
+
+  /changePassword:
+    post:
+      summary: Đổi mật khẩu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "sv001"
+                oldPassword:
+                  type: string
+                  example: "123456"
+                newPassword:
+                  type: string
+                  example: "654321"
+                type:
+                  type: string
+                  enum: [lecturer, student]
+                  example: "student"
+      responses:
+        '200':
+          description: Đổi mật khẩu thành công
+        '401':
+          description: Mật khẩu cũ không đúng
+        '404':
+          description: Không tìm thấy người dùng
