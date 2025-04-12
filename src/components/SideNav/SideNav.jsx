@@ -18,10 +18,6 @@ const SideNav = () => {
           <HomeIcon />
           <p>Home</p>
         </NavLink>
-        <NavLink to="/schedule-registration" className={({ isActive }) => isActive ? "navChild active" : "navChild"}>
-          <EventIcon />
-          <p>Register</p>
-        </NavLink>
         <NavLink to="/setting" className={({ isActive }) => isActive ? "navChild active" : "navChild"}>
           <SettingsIcon />
           <p>Setting</p>

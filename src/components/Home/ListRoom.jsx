@@ -86,9 +86,13 @@ const ListRoom = () => {
     },
   ];
 
+  const today = new Date();
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const formattedDate = today.toLocaleDateString(undefined, options);
+
   return (
     <div className="list">
-      <h1>List of rooms</h1>
+      <h1>List of rooms ({formattedDate})</h1>
       <div className="room-list">
         <Grid spacing={1} container justifyContent="center">
           {rooms.map((room) => (

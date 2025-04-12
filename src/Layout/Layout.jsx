@@ -1,20 +1,19 @@
 import './Layout.scss';
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import SideNav from "../components/SideNav/SideNav";
-import HeaderHome from '../components/Home/HeaderHome';
+import ScheduleRegistration from '../components/ScheduleRegistration/ScheduleRegistration';
+import { useSchedule } from '../context/ScheduleContext';
 
-const Layout = () => {
-  const location = useLocation();
-  const isRoomPage = location.pathname.startsWith('/room/');
+const Layout = () => {  
+  const { isScheduleOpen } = useSchedule();
 
   return (
     <main className="layout">
       <SideNav />
       <div className="outlet-container">
-        {location.pathname === '/' && <HeaderHome />}
-        {isRoomPage && <HeaderHome />}
         <Outlet />
       </div>
+      {isScheduleOpen && <ScheduleRegistration />}
     </main>
   );
 };

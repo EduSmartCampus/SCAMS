@@ -5,6 +5,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 const RoomInfo = () => {
     const roomInfo = {
+        "id": "B1_201",
         "name": "ROOM_B1_201",
         "building": "B1",
         "room_number": "101",

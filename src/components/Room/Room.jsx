@@ -1,11 +1,14 @@
+import { useSchedule } from "../../context/ScheduleContext";
 import "./Room.scss";
 
 const Room = ({ roomInfo }) => {
+  const { toggleSchedule } = useSchedule();
+
   return (
     <div>
       <div className="room">
         <p className="room-name">{roomInfo.name}</p>
-        <button className="book">
+        <button className="book" onClick={toggleSchedule}>
           <p>Book</p>
         </button>
       </div>

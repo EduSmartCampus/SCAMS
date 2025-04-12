@@ -1,0 +1,20 @@
+$border-color: #cccccc;
+$hover-color: #007bff;
+$border-radius: 8px;
+
+@mixin inputStyles {
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    padding: 5px;
+    outline: none;
+    font-size: 1rem;
+
+    &:hover {
+        border-color: $hover-color;
+        cursor: pointer;
+    }
+}
+
+.date-selector {
+    @include inputStyles;
+}

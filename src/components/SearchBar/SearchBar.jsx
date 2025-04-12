@@ -3,6 +3,7 @@ import "./SearchBar.scss";
 import Selection from "./Selection";
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from "react-router-dom";
+import DateSelector from "../DateSelector/DateSelector";
 
 const SearchBar = () => {
   const [selectedRoom, setSelectedRoom] = useState("B1-201");
@@ -108,7 +109,7 @@ const SearchBar = () => {
     <div className="search-room">
       <div className="search-form">
         <Selection options={rooms} id="room" onChange={setSelectedRoom} />
-        <input type="date" value={selectedDate} onChange={handleDateChange} />
+        <DateSelector selectedDate={selectedDate} handleDateChange={handleDateChange} />
       </div>
       <button className="search-button" onClick={handleSearch}>
         <SearchIcon className="search-icon" />
