@@ -6,16 +6,16 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const login = async (req, res) => {
 	try {
-		const { username, password, type } = req.body;
+		const { email, password, type } = req.body;
 		const UserModel = type === "lecturer" ? Lecturer : Student;
 
-		const user = await UserModel.findOne({ username });
+		const user = await UserModel.findOne({ email });
 		if (!user) return res.status(401).json({ message: 'User not found' });
 
 		const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 		if (!isPasswordCorrect) return res.status(401).json({ message: 'Wrong password' });
 
-		const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+		const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
 		res.json({ token });
 
 	} catch (err) {
@@ -26,10 +26,10 @@ const login = async (req, res) => {
 
 const changePassword= async (req, res) => {
 	try {
-		const { username, oldPassword, newPassword, type } = req.body;
+		const { email, oldPassword, newPassword, type } = req.body;
 	
 		const UserModel = type === 'lecturer' ? Lecturer : Student;
-		const user = await UserModel.findOne({ username });
+		const user = await UserModel.findOne({ email });
 	
 		if (!user) return res.status(404).json({ message: 'User not found' });
 	
