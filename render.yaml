@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: scams-backend
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://scams:scamsdb1234567@cluster0.m8wtkv6.mongodb.net/smart_campus?retryWrites=true&w=majority&appName=Cluster0

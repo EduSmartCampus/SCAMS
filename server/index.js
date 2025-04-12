@@ -13,20 +13,17 @@ app.use(express.json());
 
 // Connect to MongoDB
 mongoose
-	.connect(process.env.MONGODB_URI, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	})
-	.then(() => console.log("MongoDB connected"))
-	.catch((err) => console.error("MongoDB connection error:", err));
+	.connect(process.env.MONGODB_URI)
+	.then(() => console.log("✅ MongoDB connected"))
+	.catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // Sample route
 app.get("/", (req, res) => {
 	res.send("SCAMS Backend is running!");
 });
 
-app.listen(PORT, () => {
-	console.log(`Server listening on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+	console.log(`Server listening on http://0.0.0.0:${PORT}`);
 });
 const Room = require("./models/Room");
 
