@@ -62,13 +62,13 @@ app.post("/login", login);
 
 app.post("/signup", signup);
 
-app.post("/changePassword", changePassword);
+app.post("/changePassword", authMiddleware, changePassword);
 
 // app.use('/room', roomRoutes);
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại
 // và phần endpoint còn lại mng vô routes/room.routes.js viết
 
-app.get("/api/rooms", authMiddleware, async (req, res) => {
+app.get("/api/rooms", async (req, res) => {
 	try {
 		const rooms = await Room.find();
 		res.json(rooms);

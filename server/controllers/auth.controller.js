@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Lecturer = require('../models/Lecturer');
 const Student = require('../models/Student');
-const SECRET_KEY = process.env.SECRET_KEY;
+require("dotenv").config();
+
+const SECRET_KEY = process.env.JWT_SECRET;
 
 const login = async (req, res) => {
 	try {
@@ -75,7 +77,6 @@ const signup= async(req, res)=>{
 			role: 'student'
 		})
 
-	
 		await newUser.save();
 	
 		res.status(201).json({ message: 'User registered successfully' });

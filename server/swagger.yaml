@@ -7,6 +7,9 @@ info:
 servers:
   - url: http://localhost:5000
 
+security:
+  - bearerAuth: []
+
 paths:
   /hello:
     get:
@@ -32,7 +35,7 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                email:
                   type: string
                   example: "sv001"
                 password:
@@ -90,6 +93,8 @@ paths:
   /changePassword:
     post:
       summary: Đổi mật khẩu
+      security:
+        - bearerAuth: []   # ⬅⬅⬅ Yêu cầu JWT token ở đây
       requestBody:
         required: true
         content:
@@ -97,7 +102,7 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                email:
                   type: string
                   example: "sv001"
                 oldPassword:
@@ -117,3 +122,10 @@ paths:
           description: Mật khẩu cũ không đúng
         '404':
           description: Không tìm thấy người dùng
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
