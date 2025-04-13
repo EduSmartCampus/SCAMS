@@ -1,11 +1,89 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const Lecturer = require('../models/Lecturer');
 const Student = require('../models/Student');
 require("dotenv").config();
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
+const redis = require("../redisClient");
+
+async function saveOTPToRedis(userId, otp) {
+	const expiresIn = 10 * 60; // 10 phút
+	await redis.set(userId, otp, 'EX', expiresIn); // Lưu OTP với thời gian hết hạn
+}
+
+async function validateOTPFromRedis(userId, inputOTP) {
+	const storedOTP = await redis.get(userId); // Lấy OTP từ Redis
+  
+	if (!storedOTP) {
+	  return { success: false, message: 'OTP not found or expired.' };
+	}
+  
+	if (storedOTP === inputOTP) {
+	  return { success: true, message: 'OTP is valid.' };
+	} else {
+	  return { success: false, message: 'Invalid OTP.' };
+	}
+}
+
+function generateOTP() {
+	return Math.floor(100000 + Math.random() * 900000);  // Mã OTP 6 chữ số
+}
+  
+  // Hàm gửi email với mã OTP
+async function sendOTPEmail(email, otp) {
+	// Cấu hình gửi email
+	// const transporter = nodemailer.createTransport({
+	//   service: 'gmail',  // Sử dụng Gmail hoặc thay bằng SMTP khác
+	//   auth: {
+	// 	user: 't.dat232000@gmail.com',  // Thay bằng email của bạn
+	// 	pass: 'tdat232000@@',  // Thay bằng mật khẩu email của bạn hoặc app password
+	//   }
+	// });
+  
+	// // Nội dung email
+	// const mailOptions = {
+	//   from: 't.dat232000@gmail.com',
+	//   to: email,
+	//   subject: 'Your OTP Code',
+	//   text: `Your OTP code is: ${otp}. It is valid for 10 minutes.`  // Nội dung email
+	// };
+  
+	// // Gửi email
+	// try {
+	//   const info = await transporter.sendMail(mailOptions);
+	//   console.log('Email sent: ' + info.response);
+	// } catch (error) {
+	//   console.error('Error sending email: ', error);
+	// }
+
+	const transporter = nodemailer.createTransport({
+		host: "smtp-relay.brevo.com",
+		port: 587,
+		secure: false, // true for port 465, false for 587
+		auth: {
+		  user: "8a4cfe002@smtp-brevo.com", // your Brevo login (SMTP login)
+		  pass: "pW14mZ2adqPbzVSU"          // your SMTP password
+		}
+	  });
+	  
+	  const mailOptions = {
+		from: 'nhil31032@gmail.com',
+		to: email, // replace with your actual recipient
+		subject: "Your OTP Code",
+		text: `Your OTP code is: ${otp}. It is valid for 10 minutes.`,
+	  };
+	  
+	  transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+		  return console.error("❌ Failed to send email:", error);
+		}
+		console.log("✅ Email sent successfully:", info.response);
+	  });
+}
+  
 const login = async (req, res) => {
 	try {
 		const { email, password, type } = req.body;
@@ -17,8 +95,12 @@ const login = async (req, res) => {
 		const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 		if (!isPasswordCorrect) return res.status(401).json({ message: 'Wrong password' });
 
-		const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
-		res.json({ token, name: user.name });
+		const otp = generateOTP();  // Tạo mã OTP
+		sendOTPEmail(email, otp);  // Gửi email với mã OTP
+
+		saveOTPToRedis(email, otp);
+
+		res.json({name: user.name });
 
 	} catch (err) {
 		console.error('Login error:', err);
@@ -86,4 +168,19 @@ const signup= async(req, res)=>{
 	  }
 }
 
-module.exports={changePassword, login, signup}
+const OTPCheck= async(req,res)=>{
+	const {email, otp}=req.body
+	const result = await validateOTPFromRedis(email, otp)
+
+	if(result.success==true){
+		const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
+		res.json({ token });
+	}
+	else{
+		res.json({message: result.message})
+	}
+}
+
+
+
+module.exports={changePassword, login, signup, sendOTPEmail, generateOTP, OTPCheck}

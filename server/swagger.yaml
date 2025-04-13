@@ -53,7 +53,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
+                  name:
                     type: string
         '401':
           description: Sai thông tin đăng nhập
@@ -123,6 +123,34 @@ paths:
         '404':
           description: Không tìm thấy người dùng
 
+  /checkOTP:
+    post:
+      summary: Kiểm tra OTP đăng nhập 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "sv001"
+                otp:
+                  type: number
+                  example: 123456
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Sai thông tin đăng nhập
 components:
   securitySchemes:
     bearerAuth:

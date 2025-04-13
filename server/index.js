@@ -18,7 +18,7 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const {
 	login,
 	changePassword,
-	signup,
+	signup, OTPCheck
 } = require("./controllers/auth.controller");
 
 //import auth middleware
@@ -63,6 +63,9 @@ app.post("/login", login);
 app.post("/signup", signup);
 
 app.post("/changePassword", authMiddleware, changePassword);
+
+app.post("/checkOTP", OTPCheck);
+
 
 // app.use('/room', roomRoutes);
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại
