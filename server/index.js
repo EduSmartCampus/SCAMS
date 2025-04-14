@@ -18,7 +18,7 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const {
 	login,
 	changePassword,
-	signup, OTPCheck
+	signup, OTPCheck, resetPassword
 } = require("./controllers/auth.controller");
 
 //import auth middleware
@@ -65,6 +65,9 @@ app.post("/signup", signup);
 app.post("/changePassword", authMiddleware, changePassword);
 
 app.post("/checkOTP", OTPCheck);
+
+app.post("/resetPassword", resetPassword);
+
 
 
 // app.use('/room', roomRoutes);

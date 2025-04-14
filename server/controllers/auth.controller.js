@@ -20,8 +20,9 @@ async function validateOTPFromRedis(userId, inputOTP) {
 	if (!storedOTP) {
 	  return { success: false, message: 'OTP not found or expired.' };
 	}
+
   
-	if (storedOTP === inputOTP) {
+	if (storedOTP == inputOTP) {
 	  return { success: true, message: 'OTP is valid.' };
 	} else {
 	  return { success: false, message: 'Invalid OTP.' };
@@ -64,8 +65,8 @@ async function sendOTPEmail(email, otp) {
 		port: 587,
 		secure: false, // true for port 465, false for 587
 		auth: {
-		  user: "8a4cfe002@smtp-brevo.com", // your Brevo login (SMTP login)
-		  pass: "pW14mZ2adqPbzVSU"          // your SMTP password
+		  user: "8a4cfe003@smtp-brevo.com", // your Brevo login (SMTP login)
+		  pass: process.env.SMTP_PASSWORD        // your SMTP password
 		}
 	  });
 	  
@@ -96,6 +97,7 @@ const login = async (req, res) => {
 		if (!isPasswordCorrect) return res.status(401).json({ message: 'Wrong password' });
 
 		const otp = generateOTP();  // Tạo mã OTP
+		console.log(`Generated OTP: ${otp}`)
 		sendOTPEmail(email, otp);  // Gửi email với mã OTP
 
 		saveOTPToRedis(email, otp);
@@ -181,6 +183,31 @@ const OTPCheck= async(req,res)=>{
 	}
 }
 
+const resetPassword = async (req, res)=>{
+	try{
+		const {email, newPassword, type}=req.body
+		const UserModel = type === 'lecturer' ? Lecturer : Student;
+
+		const existingUser = await UserModel.findOne({ email });
+		if (!existingUser) {
+		  return res.status(400).json({ message: 'Email does not exist' });
+		}
+
+		const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+		await UserModel.updateOne(
+			{ email },  // điều kiện
+			{ $set: { password: hashedPassword } }      
+		);
+
+		res.status(201).json({ message: 'User reset password successfully' });
+	}catch (err) {
+		console.error('Reset Password error:', err);
+		res.status(500).json({ message: 'Internal server error' });
+	}
+	
+}
 
 
-module.exports={changePassword, login, signup, sendOTPEmail, generateOTP, OTPCheck}
+
+module.exports={changePassword, login, signup, sendOTPEmail, generateOTP, OTPCheck, resetPassword}

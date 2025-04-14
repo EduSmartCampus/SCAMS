@@ -151,6 +151,32 @@ paths:
                     type: string
         '401':
           description: Sai thông tin đăng nhập
+
+  /resetPassword:
+    post:
+      summary: Reset mật khẩu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "a@student.edu"
+                newPassword:
+                  type: string
+                  example: "123456"
+                type:
+                  type: string
+                  enum: [lecturer, student]
+                  example: "student"
+      responses:
+        '201':
+          description: Reset thành công
+        '400':
+          description: Email không tồn tại
 components:
   securitySchemes:
     bearerAuth:
