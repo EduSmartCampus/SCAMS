@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import "./ScheduleRegistration.scss";
 import TimeSelector from "../TimeSelector/TimeSelector";
@@ -12,8 +13,8 @@ const ScheduleRegistration = () => {
   const [subject, setSubject] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [startTime, setStartTime] = useState('05:00'); // Default start time
-  const [endTime, setEndTime] = useState('06:00'); // Default end time
+  const [startTime, setStartTime] = useState('05:00'); 
+  const [endTime, setEndTime] = useState('06:00'); 
   const [selectedDate, setSelectedDate] = useState("");
   const { isScheduleOpen, toggleSchedule } = useSchedule();
 
@@ -21,38 +22,50 @@ const ScheduleRegistration = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    
+    if (!user || !user.username) {
+      setError("You must be logged in as a lecturer to book a room.");
+      return;
+    }
+
+    if (!selectedDate || !subject) {
+      setError("Please fill in all required fields (Room ID, Date, Subject).");
+      return;
+    }
+
     try {
       const bookingData = {
         room_id: parseInt(roomId),
         date: selectedDate,
         start_time: startTime,
         end_time: endTime,
-        lecturer: user ? user.username : "Guest",
+        lecturer: user.username, 
         subject: subject,
       };
 
-      const response = await fetch("", {
-        method: "POST",
+      const response = await axios.post("/api/schedule", bookingData, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(bookingData),
       });
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setSuccess(
+          response.data.message ||
           `Room booked successfully for ${subject} on ${selectedDate} from ${startTime} to ${endTime}!`
         );
-        setTimeout(() => {
-          toggleSchedule();
-        }, 2000);
+        alert("Registration successful!"); 
+        toggleSchedule(); 
       } else {
-        setError("Failed to book the room. Please try again.");
+        setError(response.data.message || "Failed to book the room. Please try again.");
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError(
+        err.response?.data?.message ||
+        "An error occurred while booking the room. Please try again."
+      );
+      console.error("Error calling API:", err);
     }
-    
   };
 
   const handleDateChange = (event) => {
