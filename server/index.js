@@ -18,7 +18,8 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const {
 	login,
 	changePassword,
-	signup, OTPCheck, resetPassword
+	signup,
+	OTPCheck,
 } = require("./controllers/auth.controller");
 
 //import auth middleware
@@ -29,6 +30,9 @@ const Room = require("./models/Room");
 
 //import routes
 const roomRoutes = require("./routes/room.routes");
+const studentRoutes = require("./routes/student.routes");
+const lecturerRoutes = require("./routes/lecturer.routes");
+const scheduleRoutes = require("./routes/schedule.routes");
 
 // Middleware
 app.use(cors());
@@ -68,11 +72,13 @@ app.post("/checkOTP", OTPCheck);
 
 app.post("/resetPassword", resetPassword);
 
-
-
 // app.use('/room', roomRoutes);
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại
 // và phần endpoint còn lại mng vô routes/room.routes.js viết
+app.use("/api/rooms", roomRoutes);
+// app.use("/api/students", studentRoutes);
+// app.use("/api/lecturers", lecturerRoutes);
+// app.use("/api/schedules", scheduleRoutes);
 
 app.get("/api/rooms", async (req, res) => {
 	try {
