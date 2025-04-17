@@ -1,7 +1,6 @@
 // controllers/room.controller.js
 const Room = require("../models/Room");
 
-// Lấy tất cả phòng
 const getAllRooms = async (req, res) => {
 	try {
 		const rooms = await Room.find();
@@ -11,7 +10,6 @@ const getAllRooms = async (req, res) => {
 	}
 };
 
-// Lấy phòng theo ID
 const getRoomById = async (req, res) => {
 	try {
 		const room = await Room.findById(req.params.id);
@@ -22,7 +20,6 @@ const getRoomById = async (req, res) => {
 	}
 };
 
-// Tạo phòng mới
 const createRoom = async (req, res) => {
 	try {
 		const room = new Room(req.body);
@@ -33,7 +30,6 @@ const createRoom = async (req, res) => {
 	}
 };
 
-// Cập nhật thông tin phòng
 const updateRoom = async (req, res) => {
 	try {
 		const room = await Room.findByIdAndUpdate(req.params.id, req.body, {
@@ -45,7 +41,6 @@ const updateRoom = async (req, res) => {
 	}
 };
 
-// Xóa phòng
 const deleteRoom = async (req, res) => {
 	try {
 		await Room.findByIdAndDelete(req.params.id);
