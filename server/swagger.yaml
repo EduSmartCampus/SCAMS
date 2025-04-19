@@ -15,7 +15,7 @@ paths:
     get:
       summary: Trả về lời chào
       responses:
-        '200':
+        "200":
           description: Thành công
           content:
             application/json:
@@ -46,7 +46,7 @@ paths:
                   enum: [lecturer, student]
                   example: "student"
       responses:
-        '200':
+        "200":
           description: Đăng nhập thành công
           content:
             application/json:
@@ -55,7 +55,7 @@ paths:
                 properties:
                   name:
                     type: string
-        '401':
+        "401":
           description: Sai thông tin đăng nhập
 
   /signup:
@@ -85,16 +85,16 @@ paths:
                   type: integer
                   example: 101
       responses:
-        '201':
+        "201":
           description: Đăng ký thành công
-        '400':
+        "400":
           description: Email đã tồn tại
 
   /changePassword:
     post:
       summary: Đổi mật khẩu
       security:
-        - bearerAuth: []   # ⬅⬅⬅ Yêu cầu JWT token ở đây
+        - bearerAuth: [] # ⬅⬅⬅ Yêu cầu JWT token ở đây
       requestBody:
         required: true
         content:
@@ -116,16 +116,16 @@ paths:
                   enum: [lecturer, student]
                   example: "student"
       responses:
-        '200':
+        "200":
           description: Đổi mật khẩu thành công
-        '401':
+        "401":
           description: Mật khẩu cũ không đúng
-        '404':
+        "404":
           description: Không tìm thấy người dùng
 
   /checkOTP:
     post:
-      summary: Kiểm tra OTP đăng nhập 
+      summary: Kiểm tra OTP đăng nhập
       requestBody:
         required: true
         content:
@@ -140,7 +140,7 @@ paths:
                   type: number
                   example: 123456
       responses:
-        '200':
+        "200":
           description: Đăng nhập thành công
           content:
             application/json:
@@ -149,7 +149,7 @@ paths:
                 properties:
                   token:
                     type: string
-        '401':
+        "401":
           description: Sai thông tin đăng nhập
 
   /resetPassword:
@@ -173,10 +173,131 @@ paths:
                   enum: [lecturer, student]
                   example: "student"
       responses:
-        '201':
+        "201":
           description: Reset thành công
-        '400':
+        "400":
           description: Email không tồn tại
+
+  /rooms:
+    get:
+      summary: Lấy danh sách tất cả các phòng
+      parameters:
+        - name: building
+          in: query
+          schema:
+            type: string
+        - name: campus
+          in: query
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: device
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Danh sách phòng
+    post:
+      summary: Tạo phòng mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roomId:
+                  type: string
+                  example: "ROOM_B3_301"
+                roomName:
+                  type: string
+                  example: "Room B3 301"
+                building:
+                  type: string
+                  example: "B3"
+                roomNumber:
+                  type: number
+                  example: 301
+                capacity:
+                  type: number
+                  example: 70
+                devices:
+                  type: array
+                  items:
+                    type: string
+                  example: ["light", "projector", "fan"]
+                corridor_id:
+                  type: string
+                  example: "CORRIDOR_B3_3"
+      responses:
+        "201":
+          description: Tạo phòng thành công
+        "400":
+          description: Lỗi tạo phòng
+
+  /rooms/{id}:
+    get:
+      summary: Lấy chi tiết một phòng
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thông tin chi tiết phòng
+        "404":
+          description: Không tìm thấy phòng
+
+    put:
+      summary: Cập nhật thông tin phòng
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                capacity:
+                  type: number
+                devices:
+                  type: array
+                  items:
+                    type: string
+                availability:
+                  type: boolean
+      responses:
+        "200":
+          description: Cập nhật thành công
+
+    delete:
+      summary: Xoá phòng
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Xoá thành công
 components:
   securitySchemes:
     bearerAuth:
