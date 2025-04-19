@@ -1,18 +1,14 @@
-// db.js
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-// Create the connection pool
 const pool = mysql.createPool({
-  host: 'localhost',      // or your database server
-  user: 'root',           // your MySQL username
-  password: '0123456789',           // your MySQL password
+  host: '35.220.128.237', // from Google Cloud SQL instance
+  user: 'root',
+  password: 'kr(uX3]cQRvBdO,D',
   database: 'university_db',
+  port: 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-// Optional: convert to promise-based API
-const promisePool = pool.promise();
-
-module.exports = promisePool;
+module.exports = pool;

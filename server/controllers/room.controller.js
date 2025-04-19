@@ -1,7 +1,6 @@
 // controllers/room.controller.js
 const Room = require("../models/Room");
 
-// Lấy tất cả phòng
 const getAllRooms = async (req, res) => {
 	try {
 		const { building, campus, fromDate, toDate, device } = req.query;
@@ -76,7 +75,6 @@ const createRoom = async (req, res) => {
 	}
 };
 
-// Cập nhật thông tin phòng
 const updateRoom = async (req, res) => {
 	try {
 		const room = await Room.findByIdAndUpdate(req.params.id, req.body, {
