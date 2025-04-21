@@ -19,7 +19,7 @@ const {
 	login,
 	changePassword,
 	signup,
-	OTPCheck,
+	OTPCheck,resetPassword
 } = require("./controllers/auth.controller");
 
 //import auth middleware
@@ -70,7 +70,10 @@ app.post("/changePassword", authMiddleware, changePassword);
 
 app.post("/checkOTP", OTPCheck);
 
-//app.post("/resetPassword", resetPassword);
+
+app.post("/resetPassword",authMiddleware, resetPassword);
+
+
 
 // app.use('/room', roomRoutes);
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại
