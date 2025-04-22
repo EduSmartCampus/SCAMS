@@ -56,6 +56,7 @@ db.rooms.insertMany([
 		building: "B1",
 		room_number: 101,
 		capacity: 60,
+		devices: ["light", "fan", "sound_system", "projector", "camera"],
 		corridor_id: "CORRIDOR_B1_1",
 	},
 	{
@@ -64,6 +65,7 @@ db.rooms.insertMany([
 		building: "B1",
 		room_number: 102,
 		capacity: 60,
+		devices: ["light", "fan", "sound_system", "projector", "camera"],
 		corridor_id: "CORRIDOR_B1_1",
 	},
 	{
@@ -72,6 +74,7 @@ db.rooms.insertMany([
 		building: "B1",
 		room_number: 103,
 		capacity: 80,
+		devices: ["light", "fan", "projector", "camera"],
 		corridor_id: "CORRIDOR_B1_3",
 	},
 	{
@@ -80,6 +83,7 @@ db.rooms.insertMany([
 		building: "B1",
 		room_number: 104,
 		capacity: 50,
+		devices: ["light", "fan", "sound_system", "projector", "camera"],
 		corridor_id: "CORRIDOR_B1_4",
 	},
 	{
@@ -88,6 +92,7 @@ db.rooms.insertMany([
 		building: "B2",
 		room_number: 201,
 		capacity: 60,
+		devices: ["light", "fan", "sound_system", "projector", "camera"],
 		corridor_id: "CORRIDOR_B2_1",
 	},
 	{
@@ -96,6 +101,7 @@ db.rooms.insertMany([
 		building: "B2",
 		room_number: 202,
 		capacity: 40,
+		devices: ["light", "fan", "sound_system", "projector", "camera"],
 		corridor_id: "CORRIDOR_B2_2",
 	},
 	{
@@ -104,6 +110,7 @@ db.rooms.insertMany([
 		building: "B2",
 		room_number: 203,
 		capacity: 50,
+		devices: ["light", "fan", "sound_system", "projector", "camera"],
 		corridor_id: "CORRIDOR_B2_3",
 	},
 	{
@@ -112,6 +119,7 @@ db.rooms.insertMany([
 		building: "B2",
 		room_number: 204,
 		capacity: 70,
+		devices: ["light", "fan", "projector", "camera"],
 		corridor_id: "CORRIDOR_B2_4",
 	},
 	{
@@ -120,6 +128,7 @@ db.rooms.insertMany([
 		building: "A1",
 		room_number: 303,
 		capacity: 80,
+		devices: ["light", "fan", "projector", "camera"],
 		corridor_id: "CORRIDOR_A1_3",
 	},
 ]);
