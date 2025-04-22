@@ -216,7 +216,7 @@ paths:
             schema:
               type: object
               properties:
-                roomId:
+                _id:
                   type: string
                   example: "ROOM_B3_301"
                 roomName:
@@ -261,7 +261,7 @@ paths:
           description: Không tìm thấy phòng
 
     put:
-      summary: Cập nhật thông tin phòng
+      summary: Cập nhật thông tin phòng + lịch dạy
       parameters:
         - name: id
           in: path
@@ -275,17 +275,67 @@ paths:
             schema:
               type: object
               properties:
+                roomName:
+                  type: string
+                  example: "Phòng B4 - sửa lần 3"
+                roomNumber:
+                  type: number
+                  example: 403
+                building:
+                  type: string
+                  example: "B4"
                 capacity:
                   type: number
+                  example: 90
                 devices:
                   type: array
                   items:
                     type: string
-                availability:
-                  type: boolean
+                  example: ["light", "projector", "camera"]
+                corridor_id:
+                  type: string
+                  example: "CORRIDOR_B4_2"
+                scheduleUpdates:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        format: date
+                        example: "2025-05-01"
+                      period_1:
+                        type: object
+                        properties:
+                          hour:
+                            type: number
+                            example: 7
+                          lecture_title:
+                            type: string
+                            example: "Toán rời rạc"
+                          booked_by:
+                            type: string
+                            example: "khoa.tran@hcmut.edu.vn"
+                      period_2:
+                        type: object
+                        properties:
+                          hour:
+                            type: number
+                            example: 8
+                          lecture_title:
+                            type: string
+                            example: "CTDL & GT"
+                          booked_by:
+                            type: string
+                            example: "huy.pham@hcmut.edu.vn"
+                      # ... nếu muốn bạn có thể liệt kê đến period_12
       responses:
         "200":
           description: Cập nhật thành công
+        "400":
+          description: Lỗi cập nhật phòng
+        "404":
+          description: Không tìm thấy phòng để cập nhật
 
     delete:
       summary: Xoá phòng

@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const redis = require("./redisClient");
+const { queryMysql } = require("./MySQL/test");
+const result = await queryMysql("SELECT * FROM rooms");
 
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -19,7 +21,8 @@ const {
 	login,
 	changePassword,
 	signup,
-	OTPCheck,resetPassword
+	OTPCheck,
+	resetPassword,
 } = require("./controllers/auth.controller");
 
 //import auth middleware
@@ -41,8 +44,8 @@ app.use(express.json());
 // Connect to MongoDB
 mongoose
 	.connect(process.env.MONGODB_URI)
-	.then(() => console.log("✅ MongoDB connected"))
-	.catch((err) => console.error("❌ MongoDB connection error:", err));
+	.then(() => console.log("MongoDB connected"))
+	.catch((err) => console.error("MongoDB connection error:", err));
 
 app.listen(PORT, () => {
 	console.log(`Server listening on http://localhost:${PORT}`);
@@ -70,12 +73,9 @@ app.post("/changePassword", authMiddleware, changePassword);
 
 app.post("/checkOTP", OTPCheck);
 
+app.post("/resetPassword", authMiddleware, resetPassword);
 
-app.post("/resetPassword",authMiddleware, resetPassword);
-
-
-
-// app.use('/room', roomRoutes);
+app.use("/room", roomRoutes);
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại
 // và phần endpoint còn lại mng vô routes/room.routes.js viết
 app.use("/rooms", roomRoutes);
@@ -84,11 +84,28 @@ app.use("/rooms", roomRoutes);
 // app.use("/api/lecturers", lecturerRoutes);
 // app.use("/api/schedules", scheduleRoutes);
 
-// app.get("/api/rooms", async (req, res) => {
-// 	try {
-// 		const rooms = await Room.find();
-// 		res.json(rooms);
-// 	} catch (err) {
-// 		res.status(500).json({ error: "Lỗi lấy danh sách phòng" });
-// 	}
-// });
+app.get("/rooms", async (req, res) => {
+	// MongoDB query
+	const mongoPromise = Room.find();
+
+	// Timeout 2 giây để coi là quá tải
+	const timeout = new Promise((_, reject) =>
+		setTimeout(() => reject(new Error("MongoDB timeout")), 2000)
+	);
+
+	try {
+		// Nếu MongoDB phản hồi trong 2s dùng luôn
+		const rooms = await Promise.race([mongoPromise, timeout]);
+		return res.json(rooms);
+	} catch (err) {
+		console.warn("MongoDB bị lỗi hoặc chậm chuyển sang MySQL");
+
+		try {
+			const mysqlRooms = await queryMysql("SELECT * FROM rooms");
+			return res.json(mysqlRooms);
+		} catch (mysqlErr) {
+			console.error("MySQL cũng lỗi:", mysqlErr.message);
+			return res.status(500).send("Lỗi cả MongoDB lẫn MySQL");
+		}
+	}
+});
