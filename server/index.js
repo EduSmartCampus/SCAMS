@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const redis = require("./redisClient");
 const { queryMysql } = require("./MySQL/test");
-const result = await queryMysql("SELECT * FROM rooms");
 
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -47,6 +46,15 @@ mongoose
 	.then(() => console.log("MongoDB connected"))
 	.catch((err) => console.error("MongoDB connection error:", err));
 
+(async () => {
+	try {
+		const result = await queryMysql("SELECT * FROM rooms");
+		console.log("✅ MySQL test query OK:", result.length, "rows");
+	} catch (err) {
+		console.error("❌ MySQL test query FAILED:", err.message);
+	}
+})();
+
 app.listen(PORT, () => {
 	console.log(`Server listening on http://localhost:${PORT}`);
 	console.log(`View API docs at http://localhost:${PORT}/api-docs`);
@@ -84,28 +92,39 @@ app.use("/room", roomRoutes);
 // app.use("/api/lecturers", lecturerRoutes);
 // app.use("/api/schedules", scheduleRoutes);
 
+// MySQL-only GET route
 app.get("/rooms", async (req, res) => {
-	// MongoDB query
-	const mongoPromise = Room.find();
-
-	// Timeout 2 giây để coi là quá tải
-	const timeout = new Promise((_, reject) =>
-		setTimeout(() => reject(new Error("MongoDB timeout")), 2000)
-	);
-
 	try {
-		// Nếu MongoDB phản hồi trong 2s dùng luôn
-		const rooms = await Promise.race([mongoPromise, timeout]);
-		return res.json(rooms);
-	} catch (err) {
-		console.warn("MongoDB bị lỗi hoặc chậm chuyển sang MySQL");
-
-		try {
-			const mysqlRooms = await queryMysql("SELECT * FROM rooms");
-			return res.json(mysqlRooms);
-		} catch (mysqlErr) {
-			console.error("MySQL cũng lỗi:", mysqlErr.message);
-			return res.status(500).send("Lỗi cả MongoDB lẫn MySQL");
-		}
+		const mysqlRooms = await queryMysql("SELECT * FROM rooms");
+		res.json(mysqlRooms);
+	} catch (mysqlErr) {
+		console.error("❌ MySQL lỗi:", mysqlErr.message);
+		res.status(500).send("Lỗi khi lấy dữ liệu từ MySQL");
 	}
 });
+
+// app.get("/rooms", async (req, res) => {
+// 	// MongoDB query
+// 	const mongoPromise = Room.find();
+
+// 	// Timeout 2 giây để coi là quá tải
+// 	const timeout = new Promise((_, reject) =>
+// 		setTimeout(() => reject(new Error("MongoDB timeout")), 2000)
+// 	);
+
+// 	try {
+// 		// Nếu MongoDB phản hồi trong 2s dùng luôn
+// 		const rooms = await Promise.race([mongoPromise, timeout]);
+// 		return res.json(rooms);
+// 	} catch (err) {
+// 		console.warn("MongoDB bị lỗi hoặc chậm chuyển sang MySQL");
+
+// 		try {
+// 			const mysqlRooms = await queryMysql("SELECT * FROM rooms");
+// 			return res.json(mysqlRooms);
+// 		} catch (mysqlErr) {
+// 			console.error("MySQL cũng lỗi:", mysqlErr.message);
+// 			return res.status(500).send("Lỗi cả MongoDB lẫn MySQL");
+// 		}
+// 	}
+// });
