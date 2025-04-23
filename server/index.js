@@ -98,7 +98,7 @@ app.get("/rooms", async (req, res) => {
 		const mysqlRooms = await queryMysql("SELECT * FROM rooms");
 		res.json(mysqlRooms);
 	} catch (mysqlErr) {
-		console.error("❌ MySQL lỗi:", mysqlErr.message);
+		console.error("MySQL lỗi:", mysqlErr.message);
 		res.status(500).send("Lỗi khi lấy dữ liệu từ MySQL");
 	}
 });
