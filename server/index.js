@@ -78,7 +78,7 @@ app.post("/resetPassword", authMiddleware, resetPassword);
 app.use("/room", roomRoutes);
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại
 // và phần endpoint còn lại mng vô routes/room.routes.js viết
-app.use("/rooms", roomRoutes);
+//app.use("/rooms", roomRoutes);
 
 // app.use("/api/students", studentRoutes);
 // app.use("/api/lecturers", lecturerRoutes);
