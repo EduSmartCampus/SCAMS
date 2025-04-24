@@ -1,0 +1,3 @@
+module.exports = {
+	useBackupDB: false,
+};

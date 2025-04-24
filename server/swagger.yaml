@@ -38,13 +38,16 @@ paths:
                 email:
                   type: string
                   example: "sv001"
-                password:
-                  type: string
-                  example: "123456"
                 type:
                   type: string
                   enum: [lecturer, student]
                   example: "student"
+                password:
+                  type: string
+                  example: "123456"
+                forget:
+                  type: integer
+                  example: 0
       responses:
         "200":
           description: Đăng nhập thành công
@@ -139,6 +142,12 @@ paths:
                 otp:
                   type: number
                   example: 123456
+                type:
+                  type: sring
+                  example: "student"
+                id: 
+                  type: number
+                  example: 123
       responses:
         "200":
           description: Đăng nhập thành công

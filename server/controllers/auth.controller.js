@@ -1,13 +1,51 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const User = require("../models/User");
-const Staff = require("../models/Staff");
+const Lecturer = require("../models/Lecturer");
+const Student = require("../models/Student");
+const {
+	queryMysql,
+	insertStudent,
+	insertLecturer,
+	findLecturerByMail,
+	findStudentByMail,
+} = require("../MySQL/test");
+const useBackupDB = require("../global");
 require("dotenv").config();
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
 const redis = require("../redisClient");
+
+const crypto = require("crypto");
+
+const algorithm = "aes-256-cbc";
+const secretKey = process.env.AES_SECRET; // Store this securely
+const iv = process.env.AES_IV; // Initialization vector
+
+// Encrypt function
+function encrypt(text) {
+	const cipher = crypto.createCipheriv(
+		algorithm,
+		Buffer.from(secretKey, "hex"),
+		Buffer.from(iv, "hex")
+	);
+	let encrypted = cipher.update(text, "utf8", "hex");
+	encrypted += cipher.final("hex");
+	return encrypted;
+}
+
+// Decrypt function
+function decrypt(encryptedData) {
+	const decipher = crypto.createDecipheriv(
+		algorithm,
+		Buffer.from(secretKey, "hex"),
+		Buffer.from(iv, "hex")
+	);
+	let decrypted = decipher.update(encryptedData, "hex", "utf8");
+	decrypted += decipher.final("utf8");
+	return decrypted;
+}
 
 async function saveOTPToRedis(userId, otp) {
 	const expiresIn = 10 * 60; // 10 phút
@@ -34,31 +72,6 @@ function generateOTP() {
 
 // Hàm gửi email với mã OTP
 async function sendOTPEmail(email, otp) {
-	// Cấu hình gửi email
-	// const transporter = nodemailer.createTransport({
-	//   service: 'gmail',  // Sử dụng Gmail hoặc thay bằng SMTP khác
-	//   auth: {
-	// 	user: 't.dat232000@gmail.com',  // Thay bằng email của bạn
-	// 	pass: 'tdat232000@@',  // Thay bằng mật khẩu email của bạn hoặc app password
-	//   }
-	// });
-
-	// // Nội dung email
-	// const mailOptions = {
-	//   from: 't.dat232000@gmail.com',
-	//   to: email,
-	//   subject: 'Your OTP Code',
-	//   text: `Your OTP code is: ${otp}. It is valid for 10 minutes.`  // Nội dung email
-	// };
-
-	// // Gửi email
-	// try {
-	//   const info = await transporter.sendMail(mailOptions);
-	//   console.log('Email sent: ' + info.response);
-	// } catch (error) {
-	//   console.error('Error sending email: ', error);
-	// }
-
 	const transporter = nodemailer.createTransport({
 		host: "smtp-relay.brevo.com",
 		port: 587,
@@ -86,15 +99,36 @@ async function sendOTPEmail(email, otp) {
 
 const login = async (req, res) => {
 	try {
-		const { email, password, type } = req.body;
-		const UserModel = type === "lecturer" ? Lecturer : Student;
+		const { email, type, password = "", forget = 0 } = req.body;
 
-		const user = await UserModel.findOne({ email });
+		let user = undefined;
+		let id = undefined;
+		const encryptedEmail = encrypt(email);
+
+		if (useBackupDB.useBackupDB == false) {
+			const UserModel = type === "lecturer" ? Lecturer : Student;
+
+			user = await UserModel.findOne({ email: encryptedEmail });
+
+			id = user._id;
+		} else {
+			user =
+				type == "lecturer"
+					? findLecturerByMail(encryptedEmail)
+					: findStudentByMail(encryptedEmail);
+
+			id = user.id;
+		}
+
 		if (!user) return res.status(401).json({ message: "User not found" });
 
-		const isPasswordCorrect = bcrypt.compareSync(password, user.password);
-		if (!isPasswordCorrect)
-			return res.status(401).json({ message: "Wrong password" });
+		const decryptedName = decrypt(user.name);
+
+		if (forget == 0) {
+			const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+			if (!isPasswordCorrect)
+				return res.status(401).json({ message: "Wrong password" });
+		}
 
 		const otp = generateOTP(); // Tạo mã OTP
 		console.log(`Generated OTP: ${otp}`);
@@ -102,7 +136,7 @@ const login = async (req, res) => {
 
 		saveOTPToRedis(email, otp);
 
-		res.json({ name: user.name });
+		res.json({ name: decryptedName, type, id });
 	} catch (err) {
 		console.error("Login error:", err);
 		res.status(500).json({ message: "Internal server error" });
@@ -113,8 +147,10 @@ const changePassword = async (req, res) => {
 	try {
 		const { email, oldPassword, newPassword, type } = req.body;
 
+		const encryptedEmail = encrypt(email);
+
 		const UserModel = type === "lecturer" ? Lecturer : Student;
-		const user = await UserModel.findOne({ email });
+		const user = await UserModel.findOne({ email: encryptedEmail });
 
 		if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -126,6 +162,28 @@ const changePassword = async (req, res) => {
 		const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
 		user.password = hashedNewPassword;
 		await user.save();
+
+		const table = type === "lecturer" ? "lecturers" : "students";
+
+		const result = await queryMysql(
+			`UPDATE ${table} SET password = ? WHERE email = ?`,
+			[hashedNewPassword, encryptedEmail]
+		);
+		if (result.affectedRows === 0) {
+			console.log("No user found with that email.");
+			return { success: false, message: "User not found" };
+		}
+
+		const table = type === "lecturer" ? "lecturers" : "students";
+
+		const result = await queryMysql(
+			`UPDATE ${table} SET password = ? WHERE email = ?`,
+			[hashedNewPassword, encryptedEmail]
+		);
+		if (result.affectedRows === 0) {
+			console.log("No user found with that email.");
+			return { success: false, message: "User not found" };
+		}
 
 		res.json({ message: "Password changed successfully" });
 	} catch (err) {
@@ -145,24 +203,41 @@ const signup = async (req, res) => {
 		}
 
 		const hashedPassword = bcrypt.hashSync(password, 10);
+		const encryptedName = encrypt(name);
+		const encryptedEmail = encrypt(email);
 
 		const newUser =
 			type == "lecturer"
 				? new Lecturer({
-						name,
-						email,
+						name: encryptedName,
+						email: encryptedEmail,
 						password: hashedPassword,
 						role: "lecturer",
 				  })
 				: new Student({
 						_id: id,
-						name,
-						email,
+						name: encryptedName,
+						email: encryptedEmail,
 						password: hashedPassword,
 						role: "student",
 				  });
 
 		await newUser.save();
+
+		type == "lecturer"
+			? insertLecturer(
+					encryptedName,
+					encryptedEmail,
+					"lecturer",
+					hashedPassword
+			  )
+			: insertStudent(
+					id,
+					encryptedName,
+					encryptedEmail,
+					"student",
+					hashedPassword
+			  );
 
 		res.status(201).json({ message: "User registered successfully" });
 	} catch (err) {
@@ -172,11 +247,13 @@ const signup = async (req, res) => {
 };
 
 const OTPCheck = async (req, res) => {
-	const { email, otp } = req.body;
+	const { email, otp, type, id } = req.body;
 	const result = await validateOTPFromRedis(email, otp);
 
 	if (result.success == true) {
-		const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: "1h" });
+		const token = jwt.sign({ email, type, id }, SECRET_KEY, {
+			expiresIn: "1h",
+		});
 		res.json({ token });
 	} else {
 		res.json({ message: result.message });
@@ -186,9 +263,10 @@ const OTPCheck = async (req, res) => {
 const resetPassword = async (req, res) => {
 	try {
 		const { email, newPassword, type } = req.body;
+		const encryptedEmail = encrypt(email);
 		const UserModel = type === "lecturer" ? Lecturer : Student;
 
-		const existingUser = await UserModel.findOne({ email });
+		const existingUser = await UserModel.findOne({ email: encryptedEmail });
 		if (!existingUser) {
 			return res.status(400).json({ message: "Email does not exist" });
 		}
@@ -196,9 +274,20 @@ const resetPassword = async (req, res) => {
 		const hashedPassword = bcrypt.hashSync(newPassword, 10);
 
 		await UserModel.updateOne(
-			{ email }, // điều kiện
+			{ email: encryptedEmail }, // điều kiện
 			{ $set: { password: hashedPassword } }
 		);
+
+		const table = type === "lecturer" ? "lecturers" : "students";
+
+		const result = await queryMysql(
+			`UPDATE ${table} SET password = ? WHERE email = ?`,
+			[hashedPassword, encryptedEmail]
+		);
+		if (result.affectedRows === 0) {
+			console.log("No user found with that email.");
+			return { success: false, message: "User not found" };
+		}
 
 		res.status(201).json({ message: "User reset password successfully" });
 	} catch (err) {

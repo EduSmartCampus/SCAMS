@@ -65,6 +65,30 @@ async function testConnection() {
 	}
 }
 
+async function findStudentByMail(email) {
+	try {
+		const rows = await queryMysql("SELECT * FROM students WHERE email = ?", [
+			email,
+		]);
+		// console.log("Student(s) found:", rows);
+		return rows[0]
+	} catch (err) {
+		console.error("Error:", err);
+	}
+}
+
+async function findLecturerByMail(email) {
+	try {
+		const rows = await queryMysql("SELECT * FROM lecturers WHERE email = ?", [
+			email,
+		]);
+		// console.log("Lecturer(s) found:", rows);
+		return rows[0]
+	} catch (err) {
+		console.error("Error:", err);
+	}
+}
+
 async function findStudentByName(name) {
 	try {
 		const rows = await queryMysql("SELECT * FROM students WHERE name = ?", [
@@ -88,6 +112,18 @@ async function insertStudent(id, name, email, role, password) {
 	}
 }
 
+async function insertLecturer( name, email, role, password) {
+	try {
+		const result = await db.query(
+			"INSERT INTO lecturers (name, email, role, password) VALUES ( ?, ?, ?, ?)",
+			[ name, email, role, password]
+		);
+		console.log("Lecturer inserted, ID:", result.insertId);
+	} catch (err) {
+		console.error("Insert failed:", err);
+	}
+}
+
 // Nếu muốn test trực tiếp, bật dòng này
 // main();
 
@@ -96,4 +132,7 @@ module.exports = {
 	testConnection,
 	findStudentByName,
 	insertStudent,
+	insertLecturer,
+	findLecturerByMail,
+	findStudentByMail
 };
