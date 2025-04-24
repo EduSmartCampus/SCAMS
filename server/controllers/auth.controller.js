@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const Lecturer = require("../models/Lecturer");
-const Student = require("../models/Student");
+const User = require("../models/User");
+const Staff = require("../models/Staff");
 require("dotenv").config();
 
 const SECRET_KEY = process.env.JWT_SECRET;

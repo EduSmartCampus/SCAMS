@@ -9,66 +9,25 @@ const scheduleSchema = new mongoose.Schema({
 		type: Date,
 		required: true,
 	},
-	// Tạo các slots riêng biệt cho từng period trong một ngày
-	period_1: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
+	usedDate: {
+		type: Date,
+		required: true,
 	},
-	period_2: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
+	startPeriod: {
+		type: Number,
+		required: true,
 	},
-	period_3: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
+	endPeriod: {
+		type: Number,
+		required: true,
 	},
-	period_4: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
+	teacherId: {
+		type: Number,
+		required: true,
 	},
-	period_5: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
-	},
-	period_6: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
-	},
-	period_7: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
-	},
-	period_8: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
-	},
-	period_9: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
-	},
-	period_10: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
-	},
-	period_11: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
-	},
-	period_12: {
-		hour: Number,
-		lecture_title: String,
-		booked_by: String,
+	lectureTitle: {
+		type: String,
+		required: true,
 	},
 });
 

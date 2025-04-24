@@ -186,20 +186,6 @@ paths:
           in: query
           schema:
             type: string
-        - name: campus
-          in: query
-          schema:
-            type: string
-        - name: fromDate
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: toDate
-          in: query
-          schema:
-            type: string
-            format: date
         - name: device
           in: query
           schema:
@@ -207,6 +193,8 @@ paths:
       responses:
         "200":
           description: Danh sách phòng
+        "404":
+          description: Ko có phòng nào
     post:
       summary: Tạo phòng mới
       requestBody:
@@ -260,6 +248,7 @@ paths:
         "404":
           description: Không tìm thấy phòng
 
+    /rooms/{id}:
     put:
       summary: Cập nhật thông tin phòng + lịch dạy
       parameters:
@@ -304,38 +293,25 @@ paths:
                         type: string
                         format: date
                         example: "2025-05-01"
-                      period_1:
-                        type: object
-                        properties:
-                          hour:
-                            type: number
-                            example: 7
-                          lecture_title:
-                            type: string
-                            example: "Toán rời rạc"
-                          booked_by:
-                            type: string
-                            example: "khoa.tran@hcmut.edu.vn"
-                      period_2:
-                        type: object
-                        properties:
-                          hour:
-                            type: number
-                            example: 8
-                          lecture_title:
-                            type: string
-                            example: "CTDL & GT"
-                          booked_by:
-                            type: string
-                            example: "huy.pham@hcmut.edu.vn"
-                      # ... nếu muốn bạn có thể liệt kê đến period_12
+                      startPeriod:
+                        type: number
+                        example: 7
+                      endPeriod:
+                        type: number
+                        example: 8
+                      teacherId:
+                        type: number
+                        example: 3
+                      lectureTitle:
+                        type: string
+                        example: "Toán rời rạc"
       responses:
         "200":
           description: Cập nhật thành công
         "400":
           description: Lỗi cập nhật phòng
         "404":
-          description: Không tìm thấy phòng để cập nhật
+          description: Không tìm thấy phòng hoặc lịch
 
     delete:
       summary: Xoá phòng

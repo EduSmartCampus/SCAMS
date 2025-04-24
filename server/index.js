@@ -86,22 +86,22 @@ app.post("/resetPassword", authMiddleware, resetPassword);
 app.use("/room", roomRoutes);
 // vì 3 endpoint còn lại đều là dạng /room/... nên tui gộp lại
 // và phần endpoint còn lại mng vô routes/room.routes.js viết
-//app.use("/rooms", roomRoutes);
+app.use("/rooms", roomRoutes);
 
 // app.use("/api/students", studentRoutes);
 // app.use("/api/lecturers", lecturerRoutes);
 // app.use("/api/schedules", scheduleRoutes);
 
 // MySQL-only GET route
-app.get("/rooms", async (req, res) => {
-	try {
-		const mysqlRooms = await queryMysql("SELECT * FROM rooms");
-		res.json(mysqlRooms);
-	} catch (mysqlErr) {
-		console.error("MySQL lỗi:", mysqlErr.message);
-		res.status(500).send("Lỗi khi lấy dữ liệu từ MySQL");
-	}
-});
+// app.get("/rooms", async (req, res) => {
+// 	try {
+// 		const mysqlRooms = await queryMysql("SELECT * FROM rooms");
+// 		res.json(mysqlRooms);
+// 	} catch (mysqlErr) {
+// 		console.error("MySQL lỗi:", mysqlErr.message);
+// 		res.status(500).send("Lỗi khi lấy dữ liệu từ MySQL");
+// 	}
+// });
 
 // app.get("/rooms", async (req, res) => {
 // 	// MongoDB query

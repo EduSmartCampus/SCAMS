@@ -1,6 +1,6 @@
 // controllers/room.controller.js
 const Room = require("../models/Room");
-const Schedule = require("../models/Schedule"); // Import thêm model Schedule
+const Schedule = require("../models/Schedule");
 const getAllRooms = async (req, res) => {
 	try {
 		const { building, device } = req.query;
@@ -11,7 +11,7 @@ const getAllRooms = async (req, res) => {
 
 		// Lọc theo device (nếu có)
 		if (device) {
-			filter.devices = { $in: [device] }; // Lọc các phòng có thiết bị
+			filter.devices = { $in: [device] };
 		}
 
 		// Lấy danh sách phòng theo các filter
@@ -29,11 +29,13 @@ const getAllRooms = async (req, res) => {
 // lấy phòng theo ID
 const getRoomById = async (req, res) => {
 	try {
+		// Lấy phòng theo ID
 		const room = await Room.findOne({ _id: req.params.id });
 		if (!room) {
 			return res.status(404).json({ message: "Không tìm thấy phòng" });
 		}
 
+		// Lấy tất cả lịch của phòng theo room_id và sắp xếp theo ngày
 		const schedules = await Schedule.find({ room_id: room._id }).sort({
 			date: 1,
 		});
@@ -77,6 +79,7 @@ const createRoom = async (req, res) => {
 	}
 };
 
+// cập nhật phòng
 const updateRoom = async (req, res) => {
 	try {
 		const roomId = req.params.id;
@@ -89,7 +92,7 @@ const updateRoom = async (req, res) => {
 			devices,
 			building,
 			corridor_id,
-			scheduleUpdates, // ⬅ Dữ liệu lịch mới
+			scheduleUpdates, // Dữ liệu lịch mới
 		} = req.body;
 
 		const updateData = {};
@@ -116,12 +119,35 @@ const updateRoom = async (req, res) => {
 		// Nếu có lịch cần cập nhật
 		if (Array.isArray(scheduleUpdates)) {
 			for (const sched of scheduleUpdates) {
-				const { date, ...rest } = sched;
+				const { date, startPeriod, endPeriod, teacherId, lectureTitle } = sched;
 
-				// Cập nhật nếu đã có, chưa có thì tạo mới
+				// Kiểm tra xem có phòng và ngày này đã có lịch hay chưa
+				const existingSchedule = await Schedule.findOne({
+					room_id: roomId,
+					date,
+					startPeriod,
+				});
+
+				if (!existingSchedule) {
+					// Nếu không tìm thấy lịch cho ngày và startPeriod đó, báo lỗi
+					return res.status(404).json({
+						message: `Không có lịch nào cho ngày ${date} và period ${startPeriod}`,
+					});
+				}
+
+				// Cập nhật lịch nếu đã có, chưa có thì tạo mới
 				await Schedule.findOneAndUpdate(
-					{ room_id: roomId, date },
-					{ $set: rest, room_id: roomId, date },
+					{ room_id: roomId, date, startPeriod },
+					{
+						$set: {
+							teacherId,
+							lectureTitle,
+							room_id: roomId,
+							date,
+							startPeriod,
+							endPeriod,
+						},
+					},
 					{ upsert: true, new: true }
 				);
 			}
