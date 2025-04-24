@@ -12,8 +12,8 @@ const {
 
 router.get("/", getAllSchedules); // GET /schedules
 router.get("/:id", getScheduleById); // GET /schedules/:id
-router.post("/", authMiddleware, createSchedule); // POST /schedules
-router.put("/:id", authMiddleware, updateSchedule); // PUT /schedules/:id
-router.delete("/:id", authMiddleware, deleteSchedule); // DELETE /schedules/:id
+router.post("/", authMiddleware.authMiddleware, createSchedule); // POST /schedules
+router.put("/:id", authMiddleware.authMiddleware, updateSchedule); // PUT /schedules/:id
+router.delete("/:id", authMiddleware.authMiddleware, deleteSchedule); // DELETE /schedules/:id
 
 module.exports = router;
