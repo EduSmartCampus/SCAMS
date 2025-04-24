@@ -35,7 +35,7 @@ const Room = require("./models/Room");
 const roomRoutes = require("./routes/room.routes");
 // const studentRoutes = require("./routes/student.routes");
 // const lecturerRoutes = require("./routes/lecturer.routes");
-// const scheduleRoutes = require("./routes/schedule.routes");
+const scheduleRoutes = require("./routes/schedule.routes");
 
 // Middleware
 app.use(cors());
@@ -91,7 +91,7 @@ app.use("/room", roomRoutes);
 
 // app.use("/api/students", studentRoutes);
 // app.use("/api/lecturers", lecturerRoutes);
-// app.use("/api/schedules", scheduleRoutes);
+app.use("/schedules", scheduleRoutes);
 
 // MySQL-only GET route
 // app.get("/rooms", async (req, res) => {
