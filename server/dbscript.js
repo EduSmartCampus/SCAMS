@@ -6,7 +6,6 @@ db.staffs.insertMany([
 		email: "nguyen.thilan@hcmut.edu.vn",
 		role: "staff",
 		password: "nguyenlan123",
-		keycard: "KEY001",
 	},
 	{
 		id: 102,
@@ -14,7 +13,6 @@ db.staffs.insertMany([
 		email: "tran.thibao@hcmut.edu.vn",
 		role: "staff",
 		password: "tranbao123",
-		keycard: "KEY002",
 	},
 	{
 		id: 103,
@@ -22,7 +20,6 @@ db.staffs.insertMany([
 		email: "le.minhduc@hcmut.edu.vn",
 		role: "staff",
 		password: "leduc123",
-		keycard: "KEY003",
 	},
 	{
 		id: 104,
@@ -30,7 +27,37 @@ db.staffs.insertMany([
 		email: "pham.thithu@hcmut.edu.vn",
 		role: "staff",
 		password: "phamthu123",
-		keycard: "KEY004",
+	},
+]);
+
+db.staffs.insertMany([
+	{
+		id: 2252362,
+		name: "Anh Khoa",
+		email: "khoa.trancs2174@hcmut.edu.vn",
+		role: "student",
+		password: "khoanhtran",
+	},
+	{
+		id: 2252293,
+		name: "Huynh Mai Quoc Khang",
+		email: "khang.huynhmaiquoc@hcmut.edu.vn",
+		role: "student",
+		password: "quockhang",
+	},
+	{
+		id: 2252263,
+		name: "Tran Duy Duc Huy",
+		email: "huy.tranduyduc@hcmut.edu.vn",
+		role: "student",
+		password: "duchuy",
+	},
+	{
+		id: 2252210,
+		name: "Nguyen Quang Duy",
+		email: "huy.nguyenquang@hcmut.edu.vn",
+		role: "student",
+		password: "quangduy",
 	},
 ]);
 
@@ -133,37 +160,6 @@ db.users.insertMany([
 		email: "nguyen.vannam@hcmut.edu.vn",
 		role: "lecturer",
 		password: "nguyen.vannam",
-	},
-]);
-
-db.users.insertMany([
-	{
-		id: 2252362,
-		name: "Anh Khoa",
-		email: "khoa.trancs2174@hcmut.edu.vn",
-		role: "student",
-		password: "khoanhtran",
-	},
-	{
-		id: 2252293,
-		name: "Huynh Mai Quoc Khang",
-		email: "khang.huynhmaiquoc@hcmut.edu.vn",
-		role: "student",
-		password: "quockhang",
-	},
-	{
-		id: 2252263,
-		name: "Tran Duy Duc Huy",
-		email: "huy.tranduyduc@hcmut.edu.vn",
-		role: "student",
-		password: "duchuy",
-	},
-	{
-		id: 2252210,
-		name: "Nguyen Quang Duy",
-		email: "huy.nguyenquang@hcmut.edu.vn",
-		role: "student",
-		password: "quangduy",
 	},
 ]);
 

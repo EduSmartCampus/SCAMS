@@ -14,7 +14,7 @@ const staffSchema = new mongoose.Schema(
 			default: "staff",
 		},
 		password: String,
-		keycard: String,
+		//keycard: String,
 	},
 	{ _id: false }
 );
