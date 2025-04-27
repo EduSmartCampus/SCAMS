@@ -27,16 +27,16 @@ const createSchedule = async (req, res) => {
       return res.status(403).json({ message: "Only lecturers can create schedules" });
     }
 
-    const { title, usedDate, bookedDate, room, startPeriod, endPeriod } = req.body;
+    const { room_id, date, usedDate, startPeriod, endPeriod, lectureTitle } = req.body;
 
     const newSchedule = new Schedule({
-      teacherId: req.user.id,
-      title,
+      room_id,
+      date,
       usedDate,
-      bookedDate,
-      room,
       startPeriod,
-      endPeriod
+      endPeriod,
+      teacherId: req.user.id,
+      lectureTitle
     });
 
     const savedSchedule = await newSchedule.save();
@@ -57,14 +57,14 @@ const updateSchedule = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to edit this schedule" });
     }
 
-    const { title, usedDate, bookedDate, room, startPeriod, endPeriod } = req.body;
+    const { room_id, date, usedDate, startPeriod, endPeriod, lectureTitle } = req.body;
 
-    if (title !== undefined) schedule.title = title;
+    if (room_id !== undefined) schedule.room_id = room_id;
+    if (date !== undefined) schedule.date = date;
     if (usedDate !== undefined) schedule.usedDate = usedDate;
-    if (bookedDate !== undefined) schedule.bookedDate = bookedDate;
-    if (room !== undefined) schedule.room = room;
     if (startPeriod !== undefined) schedule.startPeriod = startPeriod;
     if (endPeriod !== undefined) schedule.endPeriod = endPeriod;
+    if (lectureTitle !== undefined) schedule.lectureTitle = lectureTitle;
 
     const updatedSchedule = await schedule.save();
     res.json(updatedSchedule);
