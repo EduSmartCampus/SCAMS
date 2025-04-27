@@ -259,6 +259,7 @@ db.schedules.insertMany([
 		endPeriod: 8,
 		teacherId: 3, // Pham Tien Thanh
 		lectureTitle: "Linear Algebra",
+		id: "9",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -268,6 +269,7 @@ db.schedules.insertMany([
 		endPeriod: 9,
 		teacherId: 4, // Nguyen Le Hoa
 		lectureTitle: "Discrete Mathematics",
+		id: "8",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -277,6 +279,7 @@ db.schedules.insertMany([
 		endPeriod: 10,
 		teacherId: 5, // Tran Hai Anh
 		lectureTitle: "Probability & Statistics",
+		id: "7",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -286,6 +289,7 @@ db.schedules.insertMany([
 		endPeriod: 11,
 		teacherId: 6, // Le Vudat
 		lectureTitle: "Numerical Methods",
+		id: "6",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -295,6 +299,7 @@ db.schedules.insertMany([
 		endPeriod: 12,
 		teacherId: 7, // Nguyen Minh Quang
 		lectureTitle: "Compiler Design",
+		id: "5",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -304,6 +309,7 @@ db.schedules.insertMany([
 		endPeriod: 13,
 		teacherId: 8, // Pham Ngoc Thanh
 		lectureTitle: "Cybersecurity",
+		id: "10",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -313,6 +319,7 @@ db.schedules.insertMany([
 		endPeriod: 14,
 		teacherId: 9, // Tran Tien Khoa
 		lectureTitle: "Data Structures",
+		id: "11",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -322,6 +329,7 @@ db.schedules.insertMany([
 		endPeriod: 15,
 		teacherId: 10, // Le Duc Thanh
 		lectureTitle: "Algorithms",
+		id: "12",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -331,6 +339,7 @@ db.schedules.insertMany([
 		endPeriod: 16,
 		teacherId: 11, // Nguyen Bich Tram
 		lectureTitle: "Computer Graphics",
+		id: "13",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -340,6 +349,7 @@ db.schedules.insertMany([
 		endPeriod: 17,
 		teacherId: 12, // Pham Nguyet Anh
 		lectureTitle: "Parallel Computing",
+		id: "14",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -349,6 +359,7 @@ db.schedules.insertMany([
 		endPeriod: 18,
 		teacherId: 13, // Do Hoang Tu
 		lectureTitle: "IoT Fundamentals",
+		id: "1",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -358,6 +369,7 @@ db.schedules.insertMany([
 		endPeriod: 19,
 		teacherId: 14, // Nguyen Van Nam
 		lectureTitle: "Blockchain Basics",
+		id: "2",
 	},
 
 	// Document 2 for ROOM_B1_101 on March 27, 2025 (similar structure)
@@ -369,6 +381,7 @@ db.schedules.insertMany([
 		endPeriod: 8,
 		teacherId: 3, // Pham Tien Thanh
 		lectureTitle: "Computer Architecture",
+		id: "3",
 	},
 	{
 		room_id: "ROOM_B1_101",
@@ -378,6 +391,7 @@ db.schedules.insertMany([
 		endPeriod: 9,
 		teacherId: 4, // Nguyen Le Hoa
 		lectureTitle: "Software Engineering",
+		id: "4",
 	},
 	// Add more periods for the rest of the day (March 27, 2025) following the same pattern
 ]);
