@@ -1,14 +1,19 @@
-const mysql = require('mysql2/promise');
-
-const pool = mysql.createPool({
-  host: '35.220.128.237', // from Google Cloud SQL instance
-  user: 'root',
-  password: 'kr(uX3]cQRvBdO,D',
-  database: 'university_db',
+const mysql = require('mysql2');
+const connection = mysql.createConnection({
+  host: 'mysqlscamsdb.mysql.database.azure.com', // your Azure MySQL server
+  user: 'mysqlbackup',              // your full username with @servername
+  password: 'scams@1234',            // your admin password
+  database: 'university_db',                // optional: or leave empty if you haven't created DB yet
   port: 3306,
-  waitForConnections: true,
-  connectionLimit: 1000000000,
-  queueLimit: 0
+  ssl: {
+    rejectUnauthorized: true
+  }
 });
-
-module.exports = pool;
+connection.connect((err) => {
+  if (err) {
+    console.error('❌ Database connection failed:', err.stack);
+  } else {
+    console.log('✅ Database connected successfully.');
+  }
+});
+module.exports = connection.promise();
