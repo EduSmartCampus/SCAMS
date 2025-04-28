@@ -208,6 +208,7 @@ const signup = async (req, res) => {
 		const encryptedName = encrypt(name);
 		// const encryptedEmail = encrypt(email);
 		const idLecturer= Math.floor(Math.random() * 900000) + 100000
+		const idUser=type=="student"? id: (Math.floor(Math.random() * 900000) + 100000)
 
 		const newUser =
 			type == "lecturer"
@@ -219,7 +220,7 @@ const signup = async (req, res) => {
 						role: type,
 				  })
 				: new User({
-						id,
+						id: idUser,
 						name: encryptedName,
 						email: encryptedEmail,
 						password: hashedPassword,
@@ -237,10 +238,10 @@ const signup = async (req, res) => {
 					hashedPassword
 			  )
 			: insertStudent(
-					id,
+					idUser,
 					encryptedName,
 					encryptedEmail,
-					"student",
+					type,
 					hashedPassword
 			  );
 
