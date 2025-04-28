@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const Lecturer = require("../models/Lecturer");
-const Student = require("../models/Student");
+const User = require("../models/User");
 const {
 	queryMysql,
 	insertStudent,
@@ -106,11 +106,11 @@ const login = async (req, res) => {
 		const encryptedEmail = encrypt(email);
 
 		if (useBackupDB.useBackupDB == false) {
-			const UserModel = type === "lecturer" ? Lecturer : Student;
+			const UserModel = type === "lecturer" ? Lecturer : User;
 
 			user = await UserModel.findOne({ email: encryptedEmail });
 
-			id = user._id;
+			id = user.id;
 		} else {
 			user =
 				type == "lecturer"
@@ -149,7 +149,7 @@ const changePassword = async (req, res) => {
 
 		const encryptedEmail = encrypt(email);
 
-		const UserModel = type === "lecturer" ? Lecturer : Student;
+		const UserModel = type === "lecturer" ? Lecturer : User;
 		const user = await UserModel.findOne({ email: encryptedEmail });
 
 		if (!user) return res.status(404).json({ message: "User not found" });
@@ -174,16 +174,16 @@ const changePassword = async (req, res) => {
 			return { success: false, message: "User not found" };
 		}
 
-		const table = type === "lecturer" ? "lecturers" : "students";
+		// const table = type === "lecturer" ? "lecturers" : "students";
 
-		const result = await queryMysql(
-			`UPDATE ${table} SET password = ? WHERE email = ?`,
-			[hashedNewPassword, encryptedEmail]
-		);
-		if (result.affectedRows === 0) {
-			console.log("No user found with that email.");
-			return { success: false, message: "User not found" };
-		}
+		// const result = await queryMysql(
+		// 	`UPDATE ${table} SET password = ? WHERE email = ?`,
+		// 	[hashedNewPassword, encryptedEmail]
+		// );
+		// if (result.affectedRows === 0) {
+		// 	console.log("No user found with that email.");
+		// 	return { success: false, message: "User not found" };
+		// }
 
 		res.json({ message: "Password changed successfully" });
 	} catch (err) {
@@ -195,37 +195,42 @@ const changePassword = async (req, res) => {
 const signup = async (req, res) => {
 	try {
 		const { name, email, password, type, id = 0 } = req.body;
-		const UserModel = type === "lecturer" ? Lecturer : Student;
+		const UserModel = type === "lecturer" ? Lecturer : User;
 
-		const existingUser = await UserModel.findOne({ email });
+		const encryptedEmail = encrypt(email);
+
+		const existingUser = await UserModel.findOne({ email: encryptedEmail });
 		if (existingUser) {
 			return res.status(400).json({ message: "Email already exists" });
 		}
 
 		const hashedPassword = bcrypt.hashSync(password, 10);
 		const encryptedName = encrypt(name);
-		const encryptedEmail = encrypt(email);
+		// const encryptedEmail = encrypt(email);
+		const idLecturer= Math.floor(Math.random() * 900000) + 100000
 
 		const newUser =
 			type == "lecturer"
 				? new Lecturer({
+						id: idLecturer,
 						name: encryptedName,
 						email: encryptedEmail,
 						password: hashedPassword,
-						role: "lecturer",
+						role: type,
 				  })
-				: new Student({
-						_id: id,
+				: new User({
+						id,
 						name: encryptedName,
 						email: encryptedEmail,
 						password: hashedPassword,
-						role: "student",
+						role: type,
 				  });
 
 		await newUser.save();
 
 		type == "lecturer"
 			? insertLecturer(
+					idLecturer,
 					encryptedName,
 					encryptedEmail,
 					"lecturer",
@@ -264,7 +269,7 @@ const resetPassword = async (req, res) => {
 	try {
 		const { email, newPassword, type } = req.body;
 		const encryptedEmail = encrypt(email);
-		const UserModel = type === "lecturer" ? Lecturer : Student;
+		const UserModel = type === "lecturer" ? Lecturer : User;
 
 		const existingUser = await UserModel.findOne({ email: encryptedEmail });
 		if (!existingUser) {

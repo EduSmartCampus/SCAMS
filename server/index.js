@@ -3,7 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const redis = require("./redisClient");
-const { queryMysql } = require("./MySQL/test");
+const { queryMysql, testConnection } = require("./MySQL/test");
 
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -67,6 +67,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 redis.get("greeting").then((result) => {
 	console.log("Redis test:", result);
 });
+
+testConnection()
 
 // Sample route
 app.get("/", (req, res) => {

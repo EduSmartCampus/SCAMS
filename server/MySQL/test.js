@@ -112,11 +112,11 @@ async function insertStudent(id, name, email, role, password) {
 	}
 }
 
-async function insertLecturer( name, email, role, password) {
+async function insertLecturer( id, name, email, role, password) {
 	try {
 		const result = await db.query(
-			"INSERT INTO lecturers (name, email, role, password) VALUES ( ?, ?, ?, ?)",
-			[ name, email, role, password]
+			"INSERT INTO lecturers (id, name, email, role, password) VALUES ( ?, ?, ?, ?, ?)",
+			[ id, name, email, role, password]
 		);
 		console.log("Lecturer inserted, ID:", result.insertId);
 	} catch (err) {

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+
+const lecturerSchema = new mongoose.Schema(
 	{
 		id: {
 			type: Number,
@@ -15,7 +16,9 @@ const userSchema = new mongoose.Schema(
 		},
 		password: String,
 	},
-	{ _id: false }
+	{ _id: true }
 );
 
-module.exports = mongoose.model("Lecturer", userSchema);
+
+module.exports = mongoose.model("Lecturer", lecturerSchema);
+
