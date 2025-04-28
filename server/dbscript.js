@@ -1,5 +1,5 @@
-// staffs
-db.staffs.insertMany([
+// users
+db.users.insertMany([
 	{
 		id: 101,
 		name: "Nguyen Thi Lan",
@@ -30,7 +30,7 @@ db.staffs.insertMany([
 	},
 ]);
 
-db.staffs.insertMany([
+db.users.insertMany([
 	{
 		id: 2252362,
 		name: "Anh Khoa",
@@ -61,8 +61,8 @@ db.staffs.insertMany([
 	},
 ]);
 
-// users
-db.users.insertMany([
+// lecturers
+db.lecturers.insertMany([
 	{
 		id: 1,
 		name: "Dr. Truong Tuan Anh",

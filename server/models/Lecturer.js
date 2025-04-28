@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const staffSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
 	{
 		id: {
 			type: Number,
@@ -11,12 +11,11 @@ const staffSchema = new mongoose.Schema(
 		email: String,
 		role: {
 			type: String,
-			default: "staff",
+			default: "lecturer",
 		},
 		password: String,
-		//keycard: String,
 	},
 	{ _id: false }
 );
 
-module.exports = mongoose.model("Staff", staffSchema);
+module.exports = mongoose.model("Lecturer", userSchema);

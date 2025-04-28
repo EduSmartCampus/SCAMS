@@ -7,13 +7,24 @@ const userSchema = new mongoose.Schema(
 			required: true,
 			unique: true,
 		},
-		name: String,
-		email: String,
+		name: {
+			type: String,
+			required: true,
+		},
+		email: {
+			type: String,
+			required: true,
+			unique: true,
+		},
 		role: {
 			type: String,
-			default: "user",
+			enum: ["staff", "student"],
+			required: true,
 		},
-		password: String,
+		password: {
+			type: String,
+			required: true,
+		},
 	},
 	{ _id: false }
 );
