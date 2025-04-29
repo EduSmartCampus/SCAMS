@@ -5,6 +5,8 @@ const cors = require("cors");
 const redis = require("./redisClient");
 const { queryMysql, testConnection } = require("./MySQL/test");
 
+require("./utils/dbMonitor")
+
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
@@ -13,7 +15,6 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const SECRET_KEY = process.env.JWT_SECRET;
 
 //used controllers
 const {
@@ -27,8 +28,6 @@ const {
 //import auth middleware
 const { authMiddleware } = require("./middlewares/auth.middleware");
 
-//import model
-const Room = require("./models/Room");
 
 //import routes
 const roomRoutes = require("./routes/room.routes");
@@ -68,8 +67,6 @@ redis.get("greeting").then((result) => {
 	console.log("Redis test:", result);
 });
 
-testConnection()
-
 // Sample route
 app.get("/", (req, res) => {
 	res.send("SCAMS Backend is running!");
@@ -105,28 +102,4 @@ app.use("/schedules", scheduleRoutes);
 // 	}
 // });
 
-// app.get("/rooms", async (req, res) => {
-// 	// MongoDB query
-// 	const mongoPromise = Room.find();
 
-// 	// Timeout 2 giây để coi là quá tải
-// 	const timeout = new Promise((_, reject) =>
-// 		setTimeout(() => reject(new Error("MongoDB timeout")), 2000)
-// 	);
-
-// 	try {
-// 		// Nếu MongoDB phản hồi trong 2s dùng luôn
-// 		const rooms = await Promise.race([mongoPromise, timeout]);
-// 		return res.json(rooms);
-// 	} catch (err) {
-// 		console.warn("MongoDB bị lỗi hoặc chậm chuyển sang MySQL");
-
-// 		try {
-// 			const mysqlRooms = await queryMysql("SELECT * FROM rooms");
-// 			return res.json(mysqlRooms);
-// 		} catch (mysqlErr) {
-// 			console.error("MySQL cũng lỗi:", mysqlErr.message);
-// 			return res.status(500).send("Lỗi cả MongoDB lẫn MySQL");
-// 		}
-// 	}
-// });
