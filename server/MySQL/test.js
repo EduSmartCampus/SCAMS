@@ -58,8 +58,8 @@ async function queryMysql(query, params = []) {
 // Các hàm khác vẫn giữ nguyên nếu bạn cần test riêng
 async function testConnection() {
 	try {
-		const rows = await queryMysql("SELECT * FROM students");
-		console.log("Students:", rows);
+		const rows = await queryMysql("SELECT * FROM users");
+		console.log("users:", rows);
 	} catch (err) {
 		console.error("Database error:", err);
 	}
@@ -67,7 +67,7 @@ async function testConnection() {
 
 async function findStudentByMail(email) {
 	try {
-		const rows = await queryMysql("SELECT * FROM students WHERE email = ?", [
+		const rows = await queryMysql("SELECT * FROM users WHERE email = ?", [
 			email,
 		]);
 		// console.log("Student(s) found:", rows);
@@ -91,7 +91,7 @@ async function findLecturerByMail(email) {
 
 async function findStudentByName(name) {
 	try {
-		const rows = await queryMysql("SELECT * FROM students WHERE name = ?", [
+		const rows = await queryMysql("SELECT * FROM users WHERE name = ?", [
 			name,
 		]);
 		console.log("Student(s) found:", rows);
@@ -103,7 +103,7 @@ async function findStudentByName(name) {
 async function insertStudent(id, name, email, role, password) {
 	try {
 		const result = await db.query(
-			"INSERT INTO students (id, name, email, role, password) VALUES (?, ?, ?, ?, ?)",
+			"INSERT INTO users (id, name, email, role, password) VALUES (?, ?, ?, ?, ?)",
 			[id, name, email, role, password]
 		);
 		console.log("Student inserted, ID:", result.insertId);
@@ -125,8 +125,6 @@ async function insertLecturer( id, name, email, role, password) {
 }
 
 // Nếu muốn test trực tiếp, bật dòng này
-// main();
-
 module.exports = {
 	queryMysql,
 	testConnection,
