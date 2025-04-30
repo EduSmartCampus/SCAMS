@@ -1,4 +1,5 @@
 const Schedule = require('../models/Schedule');
+const { v4: uuidv4 } = require('uuid');
 const {
   getAllSchedulesFromBackup,
   getScheduleByIdFromBackup,
@@ -10,10 +11,10 @@ const  {useBackupDB}  = require('../global');
 
 const getAllSchedules = async (req, res) => {
   try {
-    const { date, room_id, teacherId } = req.query;
+    const { date, room_id, teacherId, usedDate } = req.query;
 
     if (useBackupDB) {
-      const schedules = await getAllSchedulesFromBackup({ date, room_id, teacherId });
+      const schedules = await getAllSchedulesFromBackup({ date, room_id, teacherId, usedDate });
       return res.json(schedules);
     }
 
@@ -22,6 +23,7 @@ const getAllSchedules = async (req, res) => {
     if (date) filter.date = date;
     if (room_id) filter.room_id = room_id;
     if (teacherId) filter.teacherId = teacherId;
+    if (usedDate) filter.usedDate = usedDate;
 
     const schedules = await Schedule.find(filter);
     res.json(schedules);
@@ -31,6 +33,7 @@ const getAllSchedules = async (req, res) => {
   }
 };
 
+
 const getScheduleById = async (req, res) => {
   try {
     if (useBackupDB) {
@@ -38,7 +41,7 @@ const getScheduleById = async (req, res) => {
       if (!schedule) return res.status(404).json({ message: "Schedule not found" });
       return res.json(schedule);
     }
-    const schedule = await Schedule.findById(req.params.id);
+    const schedule = await Schedule.findOne({ _id: req.params.id });
     if (!schedule) return res.status(404).json({ message: "Schedule not found" });
     res.json(schedule);
   } catch (err) {
@@ -52,11 +55,20 @@ const createSchedule = async (req, res) => {
       return res.status(403).json({ message: "Only lecturers can create schedules" });
     }
 
-    const { room_id, date, usedDate, startPeriod, endPeriod, lectureTitle } = req.body;
+    const { room_id, usedDate, startPeriod, endPeriod, lectureTitle } = req.body;
+
+    // Check for overlapping schedule
+    const hasOverlap = await isScheduleOverlapping({ room_id, usedDate, startPeriod, endPeriod });
+    if (hasOverlap) {
+      return res.status(400).json({ message: "Schedule overlaps with existing schedule" });
+    }
+
+    const customId = uuidv4();
 
     const newSchedule = new Schedule({
+      id: customId, // <-- id riêng
       room_id,
-      date,
+      date: new Date(),
       usedDate,
       startPeriod,
       endPeriod,
@@ -66,11 +78,10 @@ const createSchedule = async (req, res) => {
 
     const savedSchedule = await newSchedule.save();
 
-    // Backup
     await insertScheduleToBackup({
-      id: savedSchedule.id.toString(),
+      id: newSchedule._id,
       room_id,
-      date,
+      date: savedSchedule.date,
       usedDate,
       startPeriod,
       endPeriod,
@@ -80,30 +91,53 @@ const createSchedule = async (req, res) => {
 
     res.status(201).json(savedSchedule);
   } catch (err) {
-    res.status(500).json({ message: "Error creating schedule" });
+    console.error("Error in createSchedule:", err);
+    res.status(500).json({ message: "Error creating schedule", error: err });
   }
 };
 
 const updateSchedule = async (req, res) => {
   try {
-    const schedule = await Schedule.findById(req.params.id);
+    const scheduleId = req.params.id;
+    const schedule = await Schedule.findOne( { _id: scheduleId} );
+
     if (!schedule) {
       return res.status(404).json({ message: "Schedule not found" });
     }
 
-    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId.toString()) {
+    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId) {
       return res.status(403).json({ message: "Not authorized to edit this schedule" });
     }
 
-    const updatedFields = req.body;
+    const {
+      room_id,
+      usedDate,
+      startPeriod,
+      endPeriod,
+      lectureTitle,
+    } = req.body
 
-    for (let key in updatedFields) {
-      schedule[key] = updatedFields[key];
+    // Check for overlapping schedule
+    const hasOverlap = await isScheduleOverlapping({ room_id, usedDate, startPeriod, endPeriod });
+    if (hasOverlap) {
+      return res.status(400).json({ message: "Schedule overlaps with existing schedule" });
     }
 
-    const updatedSchedule = await schedule.save();
+    const updateData = {};
+    updateData.date = new Date();
+    if (room_id !== undefined) updateData.room_id = room_id;
+    if (usedDate !== undefined) updateData.usedDate = usedDate;
+    if (startPeriod !== undefined) updateData.startPeriod = startPeriod;
+    if (endPeriod !== undefined) updateData.endPeriod = endPeriod;
+    if (lectureTitle !== undefined) updateData.lectureTitle = lectureTitle;
 
-    await updateScheduleInBackup(req.params.id, updatedFields);
+    const updatedSchedule = await Schedule.findOneAndUpdate(
+      { _id: scheduleId },
+      updateData,
+      { new: true }
+    )
+
+    await updateScheduleInBackup(req.params.id, updateData);
 
     res.json(updatedSchedule);
   } catch (err) {
@@ -113,12 +147,12 @@ const updateSchedule = async (req, res) => {
 
 const deleteSchedule = async (req, res) => {
   try {
-    const schedule = await Schedule.findById(req.params.id);
+    const schedule = await Schedule.findOne({_id: req.params.id});
     if (!schedule) {
       return res.status(404).json({ message: "Schedule not found" });
     }
 
-    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId.toString()) {
+    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId) {
       return res.status(403).json({ message: "Not authorized to delete this schedule" });
     }
 
@@ -130,6 +164,22 @@ const deleteSchedule = async (req, res) => {
     res.status(500).json({ message: "Error deleting schedule" });
   }
 };
+
+const isScheduleOverlapping = async ({ room_id, usedDate, startPeriod, endPeriod }) => {
+  const overlappingSchedule = await Schedule.findOne({
+    room_id,
+    usedDate,
+    $or: [
+      {
+        startPeriod: { $lte: endPeriod },
+        endPeriod: { $gte: startPeriod },
+      }
+    ]
+  });
+
+  return !!overlappingSchedule; // return true if overlap exists
+};
+
 
 module.exports = {
   getAllSchedules,

@@ -36,7 +36,7 @@ const scheduleSchema = new mongoose.Schema(
 			required: true,
 		},
 	},
-	{ _id: false }
+	{ _id: true }
 );
 
 module.exports = mongoose.model("Schedule", scheduleSchema);

@@ -5,7 +5,7 @@ info:
   description: API mô tả bằng Swagger
 
 servers:
-  - url: http://localhost:5000
+  - url: http://localhost:3000
 
 security:
   - bearerAuth: []
@@ -342,19 +342,22 @@ paths:
           schema:
             type: string
             format: date
-            example: "2025-05-01"
+          description: Lọc theo ngày đăng ký
+        - name: usedDate
+          in: query
+          schema:
+            type: string
+            format: date
           description: Lọc theo ngày dạy
         - name: room_id
           in: query
           schema:
             type: string
-            example: "ROOM_B3_301"
           description: Lọc theo mã phòng
-        - name: lecturer_id
+        - name: teacherId
           in: query
           schema:
             type: string
-            example: "3"
           description: Lọc theo ID giảng viên
       responses:
         "200":
@@ -370,7 +373,7 @@ paths:
                       type: string
                     room_id:
                       type: string
-                    lecturer_id:
+                    teacherId:
                       type: string
                     date:
                       type: string
@@ -398,10 +401,6 @@ paths:
                 room_id:
                   type: string
                   example: "ROOM_B3_301"
-                date:
-                  type: string
-                  format: date
-                  example: "2025-05-01"
                 usedDate:
                   type: string
                   format: date
@@ -445,7 +444,7 @@ paths:
                     type: string
                   room_id:
                     type: string
-                  lecturer_id:
+                  teacherId:
                     type: string
                   date:
                     type: string

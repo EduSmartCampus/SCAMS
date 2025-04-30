@@ -1,3 +1,4 @@
+const queryMysql = require('./test');
 // Schedule
 async function getAllSchedulesFromBackup(filters = {}) {
   let baseQuery = "SELECT * FROM schedules";
@@ -7,6 +8,10 @@ async function getAllSchedulesFromBackup(filters = {}) {
   if (filters.date) {
     conditions.push("date = ?");
     params.push(filters.date);
+  }
+  if (filters.usedDate) {
+    conditions.push("usedDate = ?");
+    params.push(filters.usedDate)
   }
   if (filters.room_id) {
     conditions.push("room_id = ?");
