@@ -1,20 +1,45 @@
 const Schedule = require('../models/Schedule');
+const {
+  getAllSchedulesFromBackup,
+  getScheduleByIdFromBackup,
+  insertScheduleToBackup,
+  updateScheduleInBackup,
+  deleteScheduleFromBackup
+} = require('../MySQL/schedule');
+const  {useBackupDB}  = require('../global');
 
 const getAllSchedules = async (req, res) => {
   try {
-    const schedules = await Schedule.find();
+    const { date, room_id, teacherId } = req.query;
+
+    if (useBackupDB) {
+      const schedules = await getAllSchedulesFromBackup({ date, room_id, teacherId });
+      return res.json(schedules);
+    }
+
+    // Build MongoDB query dynamically
+    const filter = {};
+    if (date) filter.date = date;
+    if (room_id) filter.room_id = room_id;
+    if (teacherId) filter.teacherId = teacherId;
+
+    const schedules = await Schedule.find(filter);
     res.json(schedules);
   } catch (err) {
+    console.error("Error in getAllSchedules:", err);
     res.status(500).json({ message: "Error fetching schedules" });
   }
 };
 
 const getScheduleById = async (req, res) => {
   try {
-    const schedule = await Schedule.findById(req.params.id);
-    if (!schedule) {
-      return res.status(404).json({ message: "Schedule not found" });
+    if (useBackupDB) {
+      const schedule = await getScheduleByIdFromBackup(req.params.id);
+      if (!schedule) return res.status(404).json({ message: "Schedule not found" });
+      return res.json(schedule);
     }
+    const schedule = await Schedule.findById(req.params.id);
+    if (!schedule) return res.status(404).json({ message: "Schedule not found" });
     res.json(schedule);
   } catch (err) {
     res.status(500).json({ message: "Error fetching schedule" });
@@ -36,10 +61,23 @@ const createSchedule = async (req, res) => {
       startPeriod,
       endPeriod,
       teacherId: req.user.id,
-      lectureTitle
+      lectureTitle,
     });
 
     const savedSchedule = await newSchedule.save();
+
+    // Backup
+    await insertScheduleToBackup({
+      id: savedSchedule.id.toString(),
+      room_id,
+      date,
+      usedDate,
+      startPeriod,
+      endPeriod,
+      teacherId: req.user.id,
+      lectureTitle
+    });
+
     res.status(201).json(savedSchedule);
   } catch (err) {
     res.status(500).json({ message: "Error creating schedule" });
@@ -57,16 +95,16 @@ const updateSchedule = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to edit this schedule" });
     }
 
-    const { room_id, date, usedDate, startPeriod, endPeriod, lectureTitle } = req.body;
+    const updatedFields = req.body;
 
-    if (room_id !== undefined) schedule.room_id = room_id;
-    if (date !== undefined) schedule.date = date;
-    if (usedDate !== undefined) schedule.usedDate = usedDate;
-    if (startPeriod !== undefined) schedule.startPeriod = startPeriod;
-    if (endPeriod !== undefined) schedule.endPeriod = endPeriod;
-    if (lectureTitle !== undefined) schedule.lectureTitle = lectureTitle;
+    for (let key in updatedFields) {
+      schedule[key] = updatedFields[key];
+    }
 
     const updatedSchedule = await schedule.save();
+
+    await updateScheduleInBackup(req.params.id, updatedFields);
+
     res.json(updatedSchedule);
   } catch (err) {
     res.status(500).json({ message: "Error updating schedule" });
@@ -85,6 +123,8 @@ const deleteSchedule = async (req, res) => {
     }
 
     await schedule.deleteOne();
+    await deleteScheduleFromBackup(req.params.id);
+
     res.json({ message: "Schedule deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Error deleting schedule" });
@@ -96,5 +136,5 @@ module.exports = {
   getScheduleById,
   createSchedule,
   updateSchedule,
-  deleteSchedule
+  deleteSchedule,
 };
