@@ -34,6 +34,7 @@ const roomRoutes = require("./routes/room.routes");
 // const studentRoutes = require("./routes/student.routes");
 // const lecturerRoutes = require("./routes/lecturer.routes");
 const scheduleRoutes = require("./routes/schedule.routes");
+const { getAllSchedulesFromBackup } = require("./MySQL/schedule");
 
 // Middleware
 app.use(cors());
@@ -45,14 +46,16 @@ mongoose
 	.then(() => console.log("MongoDB connected"))
 	.catch((err) => console.error("MongoDB connection error:", err));
 
-(async () => {
-	try {
-		const result = await queryMysql("SELECT * FROM rooms");
-		console.log("✅ MySQL test query OK:", result.length, "rows");
-	} catch (err) {
-		console.error("❌ MySQL test query FAILED:", err.message);
-	}
-})();
+// (async () => {
+// 	try {
+// 		const result = await queryMysql("SELECT * FROM lecturers");
+// 		console.log("✅ MySQL test query OK:", result.length, "rows");
+// 		console.log(result);
+		
+// 	} catch (err) {
+// 		console.error("❌ MySQL test query FAILED:", err.message);
+// 	}
+// })();
 
 app.listen(PORT, () => {
 	console.log(`Server listening on http://localhost:${PORT}`);
@@ -101,5 +104,4 @@ app.use("/schedules", scheduleRoutes);
 // 		res.status(500).send("Lỗi khi lấy dữ liệu từ MySQL");
 // 	}
 // });
-
 

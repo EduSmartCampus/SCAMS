@@ -1,4 +1,4 @@
-const queryMysql = require('./test');
+const { queryMysql } = require('./test');
 // Schedule
 async function getAllSchedulesFromBackup(filters = {}) {
   let baseQuery = "SELECT * FROM schedules";
@@ -11,7 +11,7 @@ async function getAllSchedulesFromBackup(filters = {}) {
   }
   if (filters.usedDate) {
     conditions.push("usedDate = ?");
-    params.push(filters.usedDate)
+    params.push(filters.usedDate);
   }
   if (filters.room_id) {
     conditions.push("room_id = ?");
@@ -28,7 +28,6 @@ async function getAllSchedulesFromBackup(filters = {}) {
 
   return await queryMysql(baseQuery, params);
 }
-
 
 async function getScheduleByIdFromBackup(id) {
   const rows = await queryMysql("SELECT * FROM schedules WHERE id = ?", [id]);

@@ -18,7 +18,6 @@ const getAllSchedules = async (req, res) => {
       return res.json(schedules);
     }
 
-    // Build MongoDB query dynamically
     const filter = {};
     if (date) filter.date = date;
     if (room_id) filter.room_id = room_id;
@@ -41,7 +40,7 @@ const getScheduleById = async (req, res) => {
       if (!schedule) return res.status(404).json({ message: "Schedule not found" });
       return res.json(schedule);
     }
-    const schedule = await Schedule.findOne({ _id: req.params.id });
+    const schedule = await Schedule.findOne({ id: req.params.id });
     if (!schedule) return res.status(404).json({ message: "Schedule not found" });
     res.json(schedule);
   } catch (err) {
@@ -66,7 +65,7 @@ const createSchedule = async (req, res) => {
     const customId = uuidv4();
 
     const newSchedule = new Schedule({
-      id: customId, // <-- id riêng
+      id: customId,
       room_id,
       date: new Date(),
       usedDate,
@@ -79,7 +78,7 @@ const createSchedule = async (req, res) => {
     const savedSchedule = await newSchedule.save();
 
     await insertScheduleToBackup({
-      id: newSchedule._id,
+      id: customId,
       room_id,
       date: savedSchedule.date,
       usedDate,
@@ -99,7 +98,7 @@ const createSchedule = async (req, res) => {
 const updateSchedule = async (req, res) => {
   try {
     const scheduleId = req.params.id;
-    const schedule = await Schedule.findOne( { _id: scheduleId} );
+    const schedule = await Schedule.findOne( { id: scheduleId } );
 
     if (!schedule) {
       return res.status(404).json({ message: "Schedule not found" });
@@ -118,7 +117,13 @@ const updateSchedule = async (req, res) => {
     } = req.body
 
     // Check for overlapping schedule
-    const hasOverlap = await isScheduleOverlapping({ room_id, usedDate, startPeriod, endPeriod });
+    const hasOverlap = await isScheduleOverlapping({
+      room_id,
+      usedDate,
+      startPeriod,
+      endPeriod,
+      excludeId: scheduleId,
+    });
     if (hasOverlap) {
       return res.status(400).json({ message: "Schedule overlaps with existing schedule" });
     }
@@ -132,7 +137,7 @@ const updateSchedule = async (req, res) => {
     if (lectureTitle !== undefined) updateData.lectureTitle = lectureTitle;
 
     const updatedSchedule = await Schedule.findOneAndUpdate(
-      { _id: scheduleId },
+      { id: scheduleId },
       updateData,
       { new: true }
     )
@@ -141,13 +146,13 @@ const updateSchedule = async (req, res) => {
 
     res.json(updatedSchedule);
   } catch (err) {
-    res.status(500).json({ message: "Error updating schedule" });
+    res.status(500).json({ message: "Error updating schedule", err });
   }
 };
 
 const deleteSchedule = async (req, res) => {
   try {
-    const schedule = await Schedule.findOne({_id: req.params.id});
+    const schedule = await Schedule.findOne({ id: req.params.id});
     if (!schedule) {
       return res.status(404).json({ message: "Schedule not found" });
     }
@@ -165,19 +170,21 @@ const deleteSchedule = async (req, res) => {
   }
 };
 
-const isScheduleOverlapping = async ({ room_id, usedDate, startPeriod, endPeriod }) => {
-  const overlappingSchedule = await Schedule.findOne({
+const isScheduleOverlapping = async ({ room_id, usedDate, startPeriod, endPeriod, excludeId }) => {
+  const query = {
     room_id,
     usedDate,
-    $or: [
-      {
-        startPeriod: { $lte: endPeriod },
-        endPeriod: { $gte: startPeriod },
-      }
-    ]
-  });
+    startPeriod: { $lte: endPeriod },
+    endPeriod: { $gte: startPeriod },
+  };
 
-  return !!overlappingSchedule; // return true if overlap exists
+  if (excludeId) {
+    query.id = { $ne: excludeId };
+  }
+
+  const overlappingSchedule = await Schedule.findOne(query);
+  
+  return !!overlappingSchedule;
 };
 
 
