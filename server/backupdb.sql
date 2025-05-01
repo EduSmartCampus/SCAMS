@@ -66,7 +66,7 @@ INSERT INTO rooms (id, name, building, room_number, capacity, devices, corridor_
 ('ROOM_A1_303', 'Room A1 303', 'A1', 303, 80, 'light,fan,projector,camera', 'CORRIDOR_A1_3');
 
 CREATE TABLE schedules (
-    id INT PRIMARY KEY,
+    id VARCHAR(50) PRIMARY KEY,
     room_id VARCHAR(50) NOT NULL,
     date DATE NOT NULL,
     usedDate DATE NOT NULL,
@@ -79,17 +79,17 @@ CREATE TABLE schedules (
 );
 
 INSERT INTO schedules (id, room_id, date, usedDate, startPeriod, endPeriod, teacherId, lectureTitle) VALUES
-(9, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 7, 8, 3, 'Linear Algebra'),
-(8, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 8, 9, 4, 'Discrete Mathematics'),
-(7, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 9, 10, 5, 'Probability & Statistics'),
-(6, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 10, 11, 6, 'Numerical Methods'),
-(5, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 11, 12, 7, 'Compiler Design'),
-(10, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 12, 13, 8, 'Cybersecurity'),
-(11, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 13, 14, 9, 'Data Structures'),
-(12, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 14, 15, 10, 'Algorithms'),
-(13, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 15, 16, 11, 'Computer Graphics'),
-(14, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 16, 17, 12, 'Parallel Computing'),
-(1, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 17, 18, 13, 'IoT Fundamentals'),
-(2, 'ROOM_B1_101', '2025-03-26', '2025-03-26', 18, 19, 14, 'Blockchain Basics'),
-(3, 'ROOM_B1_101', '2025-03-27', '2025-03-27', 7, 8, 3, 'Computer Architecture'),
-(4, 'ROOM_B1_101', '2025-03-27', '2025-03-27', 8, 9, 4, 'Software Engineering');
+('9', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 7, 8, 3, 'Linear Algebra'),
+('8', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 8, 9, 4, 'Discrete Mathematics'),
+('7', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 9, 10, 5, 'Probability & Statistics'),
+('6', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 10, 11, 6, 'Numerical Methods'),
+('5', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 11, 12, 7, 'Compiler Design'),
+('10', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 12, 13, 8, 'Cybersecurity'),
+('11', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 13, 14, 9, 'Data Structures'),
+('12', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 14, 15, 10, 'Algorithms'),
+('13', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 15, 16, 11, 'Computer Graphics'),
+('14', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 16, 17, 12, 'Parallel Computing'),
+('1', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 17, 18, 13, 'IoT Fundamentals'),
+('2', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 18, 19, 14, 'Blockchain Basics'),
+('3', 'ROOM_B1_101', '2025-03-27', '2025-03-27', 7, 8, 3, 'Computer Architecture'),
+('4', 'ROOM_B1_101', '2025-03-27', '2025-03-27', 8, 9, 4, 'Software Engineering');
