@@ -1,24 +1,43 @@
 // controllers/room.controller.js
 const Room = require("../models/Room");
 const Schedule = require("../models/Schedule");
+const { queryMysql } = require("../MySQL/test");
+const useBackupDB = require("../global");
+
+// lấy tất cả rooms
 const getAllRooms = async (req, res) => {
 	try {
+		console.log("[getAllRooms] useBackupDB:", useBackupDB.useBackupDB);
 		const { building, device } = req.query;
-		let filter = {};
 
-		// Lọc theo building
-		if (building) filter.building = building;
+		if (useBackupDB.useBackupDB) {
+			let sql = "SELECT * FROM rooms";
+			const params = [];
 
-		// Lọc theo device (nếu có)
-		if (device) {
-			filter.devices = { $in: [device] };
+			if (building) {
+				sql += " WHERE building = ?";
+				params.push(building);
+			}
+
+			const rooms = await queryMysql(sql, params);
+
+			// parse devices text field into array
+			for (const room of rooms) {
+				room.devices = room.devices ? room.devices.split(",") : [];
+			}
+
+			if (device) {
+				return res.json(rooms.filter((r) => r.devices.includes(device)));
+			}
+
+			return res.json(rooms);
+		} else {
+			let filter = {};
+			if (building) filter.building = building;
+			if (device) filter.devices = { $in: [device] };
+			const rooms = await Room.find(filter);
+			return res.json(rooms);
 		}
-
-		// Lấy danh sách phòng theo các filter
-		const rooms = await Room.find(filter);
-
-		// Trả về danh sách phòng học
-		res.json(rooms);
 	} catch (err) {
 		res
 			.status(500)
@@ -26,32 +45,49 @@ const getAllRooms = async (req, res) => {
 	}
 };
 
-// lấy phòng theo ID
+// lấy room theo id
 const getRoomById = async (req, res) => {
 	try {
-		// Lấy phòng theo ID
-		const room = await Room.findOne({ _id: req.params.id });
-		if (!room) {
-			return res.status(404).json({ message: "Không tìm thấy phòng" });
+		console.log("[getRoomById] useBackupDB:", useBackupDB.useBackupDB);
+		const roomId = req.params.id;
+
+		if (useBackupDB.useBackupDB) {
+			const rooms = await queryMysql("SELECT * FROM rooms WHERE id = ?", [
+				roomId,
+			]);
+			if (rooms.length === 0)
+				return res.status(404).json({ message: "Không tìm thấy phòng" });
+			const room = rooms[0];
+			room.devices = room.devices ? room.devices.split(",") : [];
+
+			const schedules = await queryMysql(
+				`SELECT * FROM schedules WHERE room_id = ? ORDER BY date ASC, startPeriod ASC`,
+				[roomId]
+			);
+
+			return res.json({ room, schedules });
+		} else {
+			const room = await Room.findOne({ _id: roomId });
+			if (!room)
+				return res.status(404).json({ message: "Không tìm thấy phòng" });
+			const schedules = await Schedule.find({ room_id: room._id }).sort({
+				date: 1,
+			});
+			return res.json({ room, schedules });
 		}
-
-		// Lấy tất cả lịch của phòng theo room_id và sắp xếp theo ngày
-		const schedules = await Schedule.find({ room_id: room._id }).sort({
-			date: 1,
-		});
-
-		res.json({
-			room,
-			schedules, // Gửi kèm lịch đặt của phòng đó
-		});
 	} catch (err) {
 		res.status(500).json({ message: "Lỗi server", error: err.message });
 	}
 };
 
-// tạo phòng mới -> successful
+// tạo room mới
 const createRoom = async (req, res) => {
 	try {
+		console.log("[createRoom] Ghi cả vào MongoDB và MySQL");
+		if (req.user.role !== "staff") {
+			return res.status(403).json({ message: "Only staff can create rooms" });
+		}
+
 		const {
 			_id,
 			roomName,
@@ -62,6 +98,7 @@ const createRoom = async (req, res) => {
 			corridor_id,
 		} = req.body;
 
+		// MongoDB
 		const room = new Room({
 			_id,
 			name: roomName,
@@ -71,29 +108,40 @@ const createRoom = async (req, res) => {
 			devices,
 			corridor_id,
 		});
-
 		await room.save();
-		res.status(201).json(room);
+
+		// MySQL (store devices as comma-separated string)
+		await queryMysql(
+			`INSERT INTO rooms (id, name, building, room_number, capacity, devices, corridor_id)
+			 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			[
+				_id,
+				roomName,
+				building,
+				roomNumber,
+				capacity,
+				devices.join(","),
+				corridor_id,
+			]
+		);
+
+		res.status(201).json({ message: "Tạo phòng thành công", room });
 	} catch (err) {
 		res.status(400).json({ message: "Lỗi tạo phòng", error: err.message });
 	}
 };
 
-// cập nhật phòng
+// cập nhật room
 const updateRoom = async (req, res) => {
 	try {
-		const roomId = req.params.id;
+		console.log("[updateRoom] Ghi cả vào MongoDB và MySQL");
+		if (req.user.role !== "staff") {
+			return res.status(403).json({ message: "Only staff can update rooms" });
+		}
 
-		// Phần cập nhật phòng
-		const {
-			roomName,
-			roomNumber,
-			capacity,
-			devices,
-			building,
-			corridor_id,
-			scheduleUpdates, // Dữ liệu lịch mới
-		} = req.body;
+		const roomId = req.params.id;
+		const { roomName, roomNumber, capacity, devices, building, corridor_id } =
+			req.body;
 
 		const updateData = {};
 		if (roomName !== undefined) updateData.name = roomName;
@@ -103,55 +151,26 @@ const updateRoom = async (req, res) => {
 		if (building !== undefined) updateData.building = building;
 		if (corridor_id !== undefined) updateData.corridor_id = corridor_id;
 
-		// Cập nhật phòng
+		// MongoDB
 		const updatedRoom = await Room.findOneAndUpdate(
 			{ _id: roomId },
 			updateData,
 			{ new: true }
 		);
 
-		if (!updatedRoom) {
-			return res
-				.status(404)
-				.json({ message: "Không tìm thấy phòng để cập nhật" });
-		}
-
-		// Nếu có lịch cần cập nhật
-		if (Array.isArray(scheduleUpdates)) {
-			for (const sched of scheduleUpdates) {
-				const { date, startPeriod, endPeriod, teacherId, lectureTitle } = sched;
-
-				// Kiểm tra xem có phòng và ngày này đã có lịch hay chưa
-				const existingSchedule = await Schedule.findOne({
-					room_id: roomId,
-					date,
-					startPeriod,
-				});
-
-				if (!existingSchedule) {
-					// Nếu không tìm thấy lịch cho ngày và startPeriod đó, báo lỗi
-					return res.status(404).json({
-						message: `Không có lịch nào cho ngày ${date} và period ${startPeriod}`,
-					});
-				}
-
-				// Cập nhật lịch nếu đã có, chưa có thì tạo mới
-				await Schedule.findOneAndUpdate(
-					{ room_id: roomId, date, startPeriod },
-					{
-						$set: {
-							teacherId,
-							lectureTitle,
-							room_id: roomId,
-							date,
-							startPeriod,
-							endPeriod,
-						},
-					},
-					{ upsert: true, new: true }
-				);
-			}
-		}
+		// MySQL
+		await queryMysql(
+			`UPDATE rooms SET name = ?, room_number = ?, capacity = ?, building = ?, devices = ?, corridor_id = ? WHERE id = ?`,
+			[
+				roomName,
+				roomNumber,
+				capacity,
+				building,
+				devices.join(","),
+				corridor_id,
+				roomId,
+			]
+		);
 
 		res.json({ message: "Đã cập nhật phòng", room: updatedRoom });
 	} catch (err) {
@@ -159,12 +178,23 @@ const updateRoom = async (req, res) => {
 	}
 };
 
-// xóa phòng -> successful
+// xóa room
 const deleteRoom = async (req, res) => {
 	try {
-		const room = await Room.findByIdAndDelete(req.params.id);
-		if (!room)
-			return res.status(404).json({ message: "Không tìm thấy phòng để xoá" });
+		console.log("[deleteRoom] Ghi cả vào MongoDB và MySQL");
+		if (req.user.role !== "staff") {
+			return res.status(403).json({ message: "Only staff can delete rooms" });
+		}
+
+		const roomId = req.params.id;
+
+		// MongoDB
+		await Room.findByIdAndDelete(roomId);
+
+		// MySQL
+		await queryMysql(`DELETE FROM schedules WHERE room_id = ?`, [roomId]);
+		await queryMysql(`DELETE FROM rooms WHERE id = ?`, [roomId]);
+
 		res.json({ message: "Đã xoá phòng thành công" });
 	} catch (err) {
 		res.status(500).json({ message: "Lỗi xoá phòng", error: err.message });
