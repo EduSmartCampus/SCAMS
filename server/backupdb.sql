@@ -1,114 +1,95 @@
--- 1. Drop and recreate the database
 DROP DATABASE IF EXISTS university_db;
 CREATE DATABASE university_db;
 USE university_db;
 
--- 2. Create students table
-CREATE TABLE students (
+CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    role ENUM('staff', 'student') NOT NULL,
+    password VARCHAR(100) NOT NULL
+);
+
+INSERT INTO users (id, name, email, role, password) VALUES
+(101, 'Nguyen Thi Lan', 'nguyen.thilan@hcmut.edu.vn', 'staff', 'nguyenlan123'),
+(102, 'Tran Thi Bao', 'tran.thibao@hcmut.edu.vn', 'staff', 'tranbao123'),
+(103, 'Le Minh Duc', 'le.minhduc@hcmut.edu.vn', 'staff', 'leduc123'),
+(104, 'Pham Thi Thu', 'pham.thithu@hcmut.edu.vn', 'staff', 'phamthu123'),
+(2252362, 'Anh Khoa', 'khoa.trancs2174@hcmut.edu.vn', 'student', 'khoanhtran'),
+(2252293, 'Huynh Mai Quoc Khang', 'khang.huynhmaiquoc@hcmut.edu.vn', 'student', 'quockhang'),
+(2252263, 'Tran Duy Duc Huy', 'huy.tranduyduc@hcmut.edu.vn', 'student', 'duchuy'),
+(2252210, 'Nguyen Quang Duy', 'huy.nguyenquang@hcmut.edu.vn', 'student', 'quangduy');
+
+CREATE TABLE lecturers (
     id INT PRIMARY KEY,
     name VARCHAR(100),
     email VARCHAR(100) UNIQUE,
-    role VARCHAR(20),
+    role VARCHAR(20) DEFAULT 'lecturer',
     password VARCHAR(100)
 );
 
--- 3. Create lecturers table (id is UNSIGNED to match foreign keys)
-CREATE TABLE lecturers (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    role VARCHAR(20)DEFAULT 'lecturer',
-    password VARCHAR(100)
-);
+INSERT INTO lecturers (id, name, email, password) VALUES
+(1, 'Dr. Truong Tuan Anh', 'tuan.anhtruong@hcmut.edu.vn', 'tuananhtruong'),
+(2, 'Nguyen Hua Phung', 'phung.nguyenhua@hcmut.edu.vn', 'phungnguyen'),
+(3, 'Pham Tien Thanh', 'pham.tienthanh@hcmut.edu.vn', 'pham.tienthanh'),
+(4, 'Nguyen Le Hoa', 'nguyen.lehoa@hcmut.edu.vn', 'nguyen.lehoa'),
+(5, 'Tran Hai Anh', 'tran.haianh@hcmut.edu.vn', 'tran.haianh'),
+(6, 'Le Vudat', 'le.vudat@hcmut.edu.vn', 'le.vudat'),
+(7, 'Nguyen Minh Quang', 'nguyen.minhquang@hcmut.edu.vn', 'nguyen.minhquang'),
+(8, 'Pham Ngoc Thanh', 'pham.ngocthanh@hcmut.edu.vn', 'pham.ngocthanh'),
+(9, 'Tran Tien Khoa', 'tran.tienkhoa@hcmut.edu.vn', 'tran.tienkhoa'),
+(10, 'Le Duc Thanh', 'le.ducthanh@hcmut.edu.vn', 'le.ducthanh'),
+(11, 'Nguyen Bich Tram', 'nguyen.bichtram@hcmut.edu.vn', 'nguyen.bichtram'),
+(12, 'Pham Nguyet Anh', 'pham.nguyetanh@hcmut.edu.vn', 'pham.nguyetanh'),
+(13, 'Do Hoang Tu', 'do.hoangtu@hcmut.edu.vn', 'do.hoangtu'),
+(14, 'Nguyen Van Nam', 'nguyen.vannam@hcmut.edu.vn', 'nguyen.vannam');
 
--- 4. Create rooms table
 CREATE TABLE rooms (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(100),
     building VARCHAR(10),
     room_number INT,
     capacity INT,
+    devices TEXT,
     corridor_id VARCHAR(50)
 );
 
--- 5. Create room_devices table
-CREATE TABLE room_devices (
-    room_id VARCHAR(50),
-    device VARCHAR(50),
-    FOREIGN KEY (room_id) REFERENCES rooms(id)
-);
+INSERT INTO rooms (id, name, building, room_number, capacity, devices, corridor_id) VALUES
+('ROOM_B1_101', 'Room B1 101', 'B1', 101, 60, 'light,fan,sound_system,projector,camera', 'CORRIDOR_B1_1'),
+('ROOM_B1_102', 'Room B1 102', 'B1', 102, 60, 'light,fan,sound_system,projector,camera', 'CORRIDOR_B1_1'),
+('ROOM_B1_103', 'Room B1 103', 'B1', 103, 80, 'light,fan,projector,camera', 'CORRIDOR_B1_3'),
+('ROOM_B1_104', 'Room B1 104', 'B1', 104, 50, 'light,fan,sound_system,projector,camera', 'CORRIDOR_B1_4'),
+('ROOM_B2_201', 'Room B2 201', 'B2', 201, 60, 'light,fan,sound_system,projector,camera', 'CORRIDOR_B2_1'),
+('ROOM_B2_202', 'Room B2 202', 'B2', 202, 40, 'light,fan,sound_system,projector,camera', 'CORRIDOR_B2_2'),
+('ROOM_B2_203', 'Room B2 203', 'B2', 203, 50, 'light,fan,sound_system,projector,camera', 'CORRIDOR_B2_3'),
+('ROOM_B2_204', 'Room B2 204', 'B2', 204, 70, 'light,fan,projector,camera', 'CORRIDOR_B2_4'),
+('ROOM_A1_303', 'Room A1 303', 'A1', 303, 80, 'light,fan,projector,camera', 'CORRIDOR_A1_3');
 
--- 6. Create schedules table
 CREATE TABLE schedules (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    room_id VARCHAR(50),
-    date DATE,
-    FOREIGN KEY (room_id) REFERENCES rooms(id)
+    id VARCHAR(50) PRIMARY KEY,
+    room_id VARCHAR(50) NOT NULL,
+    date DATE NOT NULL,
+    usedDate DATE NOT NULL,
+    startPeriod INT NOT NULL,
+    endPeriod INT NOT NULL,
+    teacherId INT NOT NULL,
+    lectureTitle VARCHAR(100) NOT NULL,
+    FOREIGN KEY (room_id) REFERENCES rooms(id),
+    FOREIGN KEY (teacherId) REFERENCES lecturers(id)
 );
 
--- 7. Create schedule_slots table (with correct foreign key types)
-CREATE TABLE schedule_slots (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    schedule_id INT,
-    period INT,
-    hour INT,
-    lecture_title VARCHAR(100),
-    booked_by VARCHAR(100),
-    lecturer_id INT UNSIGNED,
-    FOREIGN KEY (schedule_id) REFERENCES schedules(id),
-    FOREIGN KEY (lecturer_id) REFERENCES lecturers(id)
-);
-
--- 8. Insert students
-INSERT INTO students (id, name, email, role, password) VALUES
-(2252362, 'Anh Khoa', 'khoa.trancs2174@hcmut.edu.vn', 'student', 'khoanhtran'),
-(2252293, 'Huynh Mai Quoc Khang', 'khang.huynhmaiquoc@hcmut.edu.vn', 'student', 'quockhang');
-
--- 9. Insert lecturers
-INSERT INTO lecturers (name, email, role, password) VALUES
-('Dr. Truong Tuan Anh', 'tuan.anhtruong@hcmut.edu.vn', 'lecturer', 'tuananhtruong'),
-('Nguyen Hua Phung', 'phung.nguyenhua@hcmut.edu.vn', 'lecturer', 'phungnguyen');
-
--- 10. Insert rooms
-INSERT INTO rooms (id, name, building, room_number, capacity, corridor_id) VALUES
-('ROOM_B1_101', 'Room B1 101', 'B1', 101, 60, 'CORRIDOR_B1_1'),
-('ROOM_B2_202', 'Room B2 202', 'B2', 202, 40, 'CORRIDOR_B2_2'),
-('ROOM_A1_303', 'Room A1 303', 'A1', 303, 80, 'CORRIDOR_A1_3');
-
--- 11. Insert room devices
-INSERT INTO room_devices (room_id, device) VALUES
-('ROOM_B1_101', 'light'),
-('ROOM_B1_101', 'fan'),
-('ROOM_B1_101', 'sound_system'),
-('ROOM_B1_101', 'projector'),
-('ROOM_B1_101', 'camera'),
-
-('ROOM_B2_202', 'light'),
-('ROOM_B2_202', 'fan'),
-('ROOM_B2_202', 'sound_system'),
-('ROOM_B2_202', 'projector'),
-('ROOM_B2_202', 'camera'),
-
-('ROOM_A1_303', 'light'),
-('ROOM_A1_303', 'fan'),
-('ROOM_A1_303', 'projector'),
-('ROOM_A1_303', 'camera');
-
--- 12. Insert schedule for ROOM_B1_101 on 2025-03-25
-INSERT INTO schedules (room_id, date)
-VALUES ('ROOM_B1_101', '2025-03-25');
-
--- 13. Insert schedule_slots for that day (assuming schedule_id = 1)
-INSERT INTO schedule_slots (schedule_id, period, hour, lecture_title, booked_by, lecturer_id) VALUES
-(1, 1, 7, 'C Programming', 'phung.huanguyen@hcmut.edu.vn', 2),
-(1, 2, 8, 'Advanced Software Engineering', 'tuan.anhtruong@hcmut.edu.vn', 1),
-(1, 3, 9, '', NULL, NULL),
-(1, 4, 10, '', NULL, NULL),
-(1, 5, 11, '', NULL, NULL),
-(1, 6, 13, '', NULL, NULL),
-(1, 7, 14, '', NULL, NULL),
-(1, 8, 15, '', NULL, NULL),
-(1, 9, 16, '', NULL, NULL),
-(1, 10, 17, '', NULL, NULL),
-(1, 11, 18, '', NULL, NULL),
-(1, 12, 19, '', NULL, NULL);
+INSERT INTO schedules (id, room_id, date, usedDate, startPeriod, endPeriod, teacherId, lectureTitle) VALUES
+('9', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 7, 8, 3, 'Linear Algebra'),
+('8', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 8, 9, 4, 'Discrete Mathematics'),
+('7', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 9, 10, 5, 'Probability & Statistics'),
+('6', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 10, 11, 6, 'Numerical Methods'),
+('5', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 11, 12, 7, 'Compiler Design'),
+('10', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 12, 13, 8, 'Cybersecurity'),
+('11', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 13, 14, 9, 'Data Structures'),
+('12', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 14, 15, 10, 'Algorithms'),
+('13', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 15, 16, 11, 'Computer Graphics'),
+('14', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 16, 17, 12, 'Parallel Computing'),
+('1', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 17, 18, 13, 'IoT Fundamentals'),
+('2', 'ROOM_B1_101', '2025-03-26', '2025-03-26', 18, 19, 14, 'Blockchain Basics'),
+('3', 'ROOM_B1_101', '2025-03-27', '2025-03-27', 7, 8, 3, 'Computer Architecture'),
+('4', 'ROOM_B1_101', '2025-03-27', '2025-03-27', 8, 9, 4, 'Software Engineering');

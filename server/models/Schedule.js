@@ -1,17 +1,42 @@
 const mongoose = require("mongoose");
 
-const scheduleSchema = new mongoose.Schema({
-	room_id: String,
-	date: Date,
-	slots: [
-		{
-			period: Number,
-			hour: Number,
-			lecture_title: String,
-			booked_by: String,
-			lecturer_id: String,
+const scheduleSchema = new mongoose.Schema(
+	{
+		id: {
+			type: String,
+			required: true,
+			unique: true,
 		},
-	],
-});
+		room_id: {
+			type: String,
+			required: true,
+		},
+		date: {
+			type: Date,
+			required: true,
+		},
+		usedDate: {
+			type: Date,
+			required: true,
+		},
+		startPeriod: {
+			type: Number,
+			required: true,
+		},
+		endPeriod: {
+			type: Number,
+			required: true,
+		},
+		teacherId: {
+			type: Number,
+			required: true,
+		},
+		lectureTitle: {
+			type: String,
+			required: true,
+		},
+	},
+	{ _id: true }
+);
 
 module.exports = mongoose.model("Schedule", scheduleSchema);
