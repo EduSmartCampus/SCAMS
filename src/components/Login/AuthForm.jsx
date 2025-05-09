@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './AuthForm.scss';
 
-const AuthForm = ({ isSignUp }) => {
+const AuthForm = ({ isSignUp, setIsSignUp }) => {
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -14,11 +14,19 @@ const AuthForm = ({ isSignUp }) => {
     const [token, setToken] = useState(null);
     const [pendingAuth, setPendingAuth] = useState(null);
     const formRef = useRef(null);
+    const emailInputRef = useRef(null);
 
     // Reset error when state changes
     useEffect(() => {
         setError('');
     }, [isForgotPassword, userData, token, otp, pendingAuth]);
+
+    // Auto-focus email input after switching to login form post-signup
+    useEffect(() => {
+        if (!isSignUp && !isForgotPassword && !pendingAuth && emailInputRef.current) {
+            emailInputRef.current.focus();
+        }
+    }, [isSignUp, isForgotPassword, pendingAuth]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -36,10 +44,16 @@ const AuthForm = ({ isSignUp }) => {
         }
 
         if ((isForgotPassword && userData && !token) || pendingAuth) {
-            // Handle OTP verification
+            // Handle OTP verification (only for login or forgot password)
             if (!otp.trim()) {
-                setError('OTP is required');
+
                 toast.error('Please enter a valid OTP.');
+                return;
+            }
+
+            // Kiểm tra OTP chỉ chứa số
+            if (!/^\d+$/.test(otp.trim())) {
+                toast.error('Invalid OTP');
                 return;
             }
 
@@ -72,21 +86,19 @@ const AuthForm = ({ isSignUp }) => {
                     toast.success('OTP verified successfully!');
 
                     if (pendingAuth) {
-                        // Complete login/signup
+                        // Complete login
                         localStorage.setItem('userInfo', JSON.stringify(pendingAuth.userInfo));
-                        toast.success(isSignUp ? 'Account created successfully!' : 'Logged in successfully!');
+                        toast.success('Logged in successfully!');
                         setPendingAuth(null);
                         navigate('/');
                     }
                 } else {
-                    setError('No token received from server');
-                    toast.error('The server did not return a token. Please check the console for details.');
+                    // setError('No token received from server');
+                    toast.error('Invalid OTP. Please try again.');
                 }
             } else if (response.status === 401) {
-                setError('Invalid OTP');
                 toast.error('Invalid OTP. Please try again.');
             } else {
-                setError('An unexpected error occurred');
                 toast.error('An unexpected error occurred. Please try again later.');
             }
         } else if (isForgotPassword && !userData) {
@@ -111,10 +123,10 @@ const AuthForm = ({ isSignUp }) => {
                 setError('');
                 toast.success('OTP sent to your email.');
             } else if (response.status === 401) {
-                setError('Email not found');
+
                 toast.error('Email not found. Please check your email.');
             } else {
-                setError('An unexpected error occurred');
+
                 toast.error('An unexpected error occurred. Please try again later.');
             }
         } else {
@@ -134,20 +146,27 @@ const AuthForm = ({ isSignUp }) => {
 
             if (response.status === 200 || response.status === 201) {
                 const data = await response.json();
-                // Prepare user info
-                const userInfo = isSignUp
-                    ? { name, email, type, password }
-                    : { name: data.name || 'Unknown User', email, type, password };
-
-                // Set pending auth state for OTP verification
-                setPendingAuth({
-                    userInfo,
-                    email,
-                    type,
-                    id: isSignUp ? id : undefined,
-                });
-                setError('');
-                toast.success('OTP sent to your email.');
+                if (isSignUp) {
+                    // Handle signup: show success message and switch to login
+                    toast.success('Account created successfully! Please sign in.');
+                    setError('');
+                    setIsSignUp(false); // Switch to login form
+                } else {
+                    // Handle login: proceed with OTP verification
+                    const userInfo = {
+                        name: data.name || 'Unknown User',
+                        email,
+                        type,
+                        password,
+                    };
+                    setPendingAuth({
+                        userInfo,
+                        email,
+                        type,
+                    });
+                    setError('');
+                    toast.success('OTP sent to your email.');
+                }
             } else if (response.status === 400) {
                 toast.error(isSignUp ? 'Email already exists' : 'Invalid email or role');
             } else if (response.status === 401 || response.status === 500) {
@@ -160,7 +179,7 @@ const AuthForm = ({ isSignUp }) => {
 
     const handleResetPassword = async () => {
         if (!newPassword.trim()) {
-            setError('New password is required');
+
             toast.error('Please enter a new password.');
             return;
         }
@@ -198,14 +217,13 @@ const AuthForm = ({ isSignUp }) => {
                     setNewPassword('');
                 }, 1000);
             } else if (response.status === 400) {
-                setError('Email does not exist');
+
                 toast.error('Email does not exist. Please try again.');
             } else {
-                setError('Failed to reset password');
+
                 toast.error(`Failed to reset password: ${data.message || 'Please try again later.'}`);
             }
         } else {
-            setError('Invalid token or user data');
             toast.error('Invalid token or user data. Please try again.');
         }
     };
@@ -243,7 +261,7 @@ const AuthForm = ({ isSignUp }) => {
                 {!isForgotPassword && !pendingAuth && (
                     <>
                         {isSignUp && <input type="text" placeholder="Name" required />}
-                        <input type="email" placeholder="Email" required />
+                        <input type="email" placeholder="Email" required ref={emailInputRef} />
                         <input type="password" placeholder="Password" required />
                         {isSignUp ? (
                             <input type="text" name="studentId" placeholder="Student ID" required />
@@ -269,7 +287,7 @@ const AuthForm = ({ isSignUp }) => {
                 )}
                 {isForgotPassword && !userData && (
                     <>
-                        <input type="email" placeholder="Email" required />
+                        <input type="email" placeholder="Email" required ref={emailInputRef} />
                         <select name="type" required>
                             <option value="" disabled selected>
                                 Select your role
