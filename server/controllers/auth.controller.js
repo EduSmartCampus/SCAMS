@@ -310,4 +310,5 @@ module.exports = {
 	generateOTP,
 	OTPCheck,
 	resetPassword,
+	decrypt
 };
