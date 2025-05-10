@@ -52,28 +52,46 @@ const getRoomById = async (req, res) => {
 		const roomId = req.params.id;
 
 		if (useBackupDB.useBackupDB) {
+			// MySQL: dùng JOIN để lấy schedule có kèm tên phòng
 			const rooms = await queryMysql("SELECT * FROM rooms WHERE id = ?", [
 				roomId,
 			]);
 			if (rooms.length === 0)
 				return res.status(404).json({ message: "Không tìm thấy phòng" });
+
 			const room = rooms[0];
 			room.devices = room.devices ? room.devices.split(",") : [];
 
+			// Join với bảng rooms để lấy room name
 			const schedules = await queryMysql(
-				`SELECT * FROM schedules WHERE room_id = ? ORDER BY date ASC, startPeriod ASC`,
+				`
+				SELECT s.*, r.name AS roomName
+				FROM schedules s
+				JOIN rooms r ON s.room_id = r.id
+				WHERE s.room_id = ?
+				ORDER BY s.date ASC, s.startPeriod ASC
+			`,
 				[roomId]
 			);
 
 			return res.json({ room, schedules });
 		} else {
+			// MongoDB
 			const room = await Room.findOne({ _id: roomId });
 			if (!room)
 				return res.status(404).json({ message: "Không tìm thấy phòng" });
+
 			const schedules = await Schedule.find({ room_id: room._id }).sort({
 				date: 1,
 			});
-			return res.json({ room, schedules });
+
+			// Gắn room name vào từng schedule
+			const schedulesWithRoomName = schedules.map((s) => ({
+				...s.toObject(),
+				roomName: room.name,
+			}));
+
+			return res.json({ room, schedules: schedulesWithRoomName });
 		}
 	} catch (err) {
 		res.status(500).json({ message: "Lỗi server", error: err.message });
