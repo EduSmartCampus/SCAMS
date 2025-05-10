@@ -90,7 +90,7 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
                         localStorage.setItem('userInfo', JSON.stringify(pendingAuth.userInfo));
                         toast.success('Logged in successfully!');
                         setPendingAuth(null);
-                        navigate('/');
+                        navigate('/home');
                     }
                 } else {
                     // setError('No token received from server');
@@ -209,7 +209,7 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
                 localStorage.setItem('authToken', token);
                 toast.success('Password reset successfully!');
                 setTimeout(() => {
-                    navigate('/');
+                    navigate('/home');
                     setIsForgotPassword(false);
                     setUserData(null);
                     setToken(null);

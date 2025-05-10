@@ -2,6 +2,14 @@
     margin-top: 20px;
     height: 660px;
 
+    .no-room {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+        width: 100%;
+        height: 100%;
+    }
+
     .room-list {
         margin-top: 10px;
         width: 100%;

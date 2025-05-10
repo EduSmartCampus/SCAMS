@@ -8,6 +8,7 @@
   position: absolute;
   top: 0;
   background-color: rgba(0, 0, 0, 0.3);
+  z-index: 10;
 
   @keyframes slideUp {
     from {
@@ -43,9 +44,11 @@
     width: 500px;
     max-width: 500px;
     box-sizing: border-box;
+    pointer-events: none;
 
     &.open {
       opacity: 1;
+      pointer-events: auto;
     }
 
     .close-icon {

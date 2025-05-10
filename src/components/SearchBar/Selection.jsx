@@ -1,6 +1,6 @@
-const Selection = ({ options, id, onChange }) => {
+const Selection = ({ options, id, value, onChange }) => {
     return (
-        <select id={id} onChange={(e) => onChange(e.target.value)}>
+        <select id={id} value={value} onChange={(e) => onChange(e.target.value)}>
             {options.map((option) => (
                 <option key={option.id} value={option.id}>{option.name}</option>
             ))}

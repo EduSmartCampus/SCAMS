@@ -3,7 +3,7 @@ import "./TimeSelector.scss"
 const TimeSelector = ({ startTime, endTime, setStartTime, setEndTime }) => {
     // Create an array of time options from 5 AM to 11 PM
     const timeOptions = [];
-    for (let h = 5; h <= 21; h++) {
+    for (let h = 7; h <= 22; h++) {
         const time = `${h}:00`;
         timeOptions.push(time);
     }

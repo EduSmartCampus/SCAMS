@@ -1,70 +1,67 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ScheduleRegistration.scss";
 import TimeSelector from "../TimeSelector/TimeSelector";
 import DateSelector from "../DateSelector/DateSelector";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import CloseIcon from '@mui/icons-material/Close';
 import { useSchedule } from "../../context/ScheduleContext";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
 const ScheduleRegistration = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [roomId, setRoomId] = useState("");
-  const [subject, setSubject] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [startTime, setStartTime] = useState('05:00'); 
-  const [endTime, setEndTime] = useState('06:00'); 
+  const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
+  const [subject, setSubject] = useState("Calculus 1");
+  const [startTime, setStartTime] = useState('07:00'); 
+  const [endTime, setEndTime] = useState('08:00'); 
   const [selectedDate, setSelectedDate] = useState("");
-  const { isScheduleOpen, toggleSchedule } = useSchedule();
+  const { isScheduleOpen, toggleSchedule, roomName } = useSchedule();
+  const token = localStorage.getItem("authToken");
+  const { id } = useParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     
-    if (!user || !user.username) {
-      setError("You must be logged in as a lecturer to book a room.");
+    if (userInfo == null) {
+      console.log("submit1")
+      toast.error("You must be logged in as a lecturer to book a room.");
       return;
     }
 
-    if (!selectedDate || !subject) {
-      setError("Please fill in all required fields (Room ID, Date, Subject).");
+    if (selectedDate == "" || subject == "") {
+      console.log("submit2")
+      toast.error("Please fill in all required fields (Room ID, Date, Subject).");
       return;
     }
+
+    console.log("submit")
 
     try {
       const bookingData = {
-        room_id: parseInt(roomId),
-        date: selectedDate,
-        start_time: startTime,
-        end_time: endTime,
-        lecturer: user.username, 
-        subject: subject,
+        room_id: id,
+        usedDate: selectedDate,
+        startPeriod: parseInt(startTime.split(':')[0]),
+        endPeriod: parseInt(endTime.split(':')[0]),
+        lectureTitle: subject,
       };
 
-      const response = await axios.post("/api/schedule", bookingData, {
+      const response = await axios.post("http://localhost:3000/schedules", bookingData, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.status === 200 || response.status === 201) {
-        setSuccess(
-          response.data.message ||
+        toast.success(
           `Room booked successfully for ${subject} on ${selectedDate} from ${startTime} to ${endTime}!`
-        );
-        alert("Registration successful!"); 
+        ); 
         toggleSchedule(); 
       } else {
-        setError(response.data.message || "Failed to book the room. Please try again.");
+        toast.error("Failed to book the room. Please try again.");
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "An error occurred while booking the room. Please try again."
-      );
-      console.error("Error calling API:", err);
+      toast.error("An error occurred while booking the room. Please try again.");
     }
   };
 
@@ -76,6 +73,12 @@ const ScheduleRegistration = () => {
     setSubject(event.target.value);
   }
 
+  useEffect(() => {
+    console.log(selectedDate);
+    console.log(subject);
+    console.log(userInfo)
+  }, [selectedDate, subject, userInfo])
+
   return (
     <div className="outside-form">
       <div className={`schedule-registration ${isScheduleOpen ? 'open': ''}`}>
@@ -83,11 +86,11 @@ const ScheduleRegistration = () => {
           <CloseIcon className="icon" />
         </button>
         <h2>Schedule Registration</h2>
-        <h3>Room B1-201</h3>
-        <form onSubmit={handleSubmit}>
+        <h3>{roomName}</h3>
+        <form onSubmit={(event) => handleSubmit(event)}>
           <div>
             <label>Date: </label>
-            <DateSelector selectedDate={selectedDate} handleDateChange={handleDateChange} />
+            <DateSelector selectedDate={selectedDate} handleDateChange={handleDateChange} minDate={new Date().toISOString().split('T')[0]} />
           </div>
           <TimeSelector startTime={startTime} endTime={endTime} setStartTime={setStartTime} setEndTime={setEndTime} />
           <div>
@@ -95,8 +98,6 @@ const ScheduleRegistration = () => {
             <SubjectSelector subject={subject} handleSubjectChange={handleSubjectChange} />
           </div>
           <button type="submit">Book Room</button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {success && <p style={{ color: "green" }}>{success}</p>}
         </form>
       </div>
     </div>

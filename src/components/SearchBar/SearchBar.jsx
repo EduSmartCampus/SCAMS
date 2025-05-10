@@ -1,119 +1,134 @@
 import { useState } from "react";
 import "./SearchBar.scss";
 import Selection from "./Selection";
-import SearchIcon from '@mui/icons-material/Search';
-import { useNavigate } from "react-router-dom";
-import DateSelector from "../DateSelector/DateSelector";
+import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
+import { useFilter } from "../../context/FilterContext";
 
 const SearchBar = () => {
-  const [selectedRoom, setSelectedRoom] = useState("B1-201");
-  const [selectedDate, setSelectedDate] = useState("");
-  const navigate = useNavigate();
+  const [selectedBuilding, setSelectedBuilding] = useState("");
+  const [selectedFloor, setSelectedFloor] = useState("");
+  const { applyFilter, clearFilter } = useFilter();
 
-  const rooms = [
+  const buildings = [
     {
-      id: "B1-201",
-      name: "B1-201",
+      id: "",
+      name: "Choose building"
     },
     {
-      id: "B1-202",
-      name: "B1-202",
+      id: "B1",
+      name: "B1",
     },
     {
-      id: "B1-203",
-      name: "B1-203",
+      id: "B2",
+      name: "B2",
     },
     {
-      id: "B1-204",
-      name: "B1-204",
+      id: "B3",
+      name: "B3",
     },
     {
-      id: "B1-205",
-      name: "B1-205",
+      id: "B4",
+      name: "B4",
     },
     {
-      id: "B1-206",
-      name: "B1-206",
+      id: "B5",
+      name: "B5",
     },
     {
-      id: "B1-207",
-      name: "B1-207",
+      id: "B8",
+      name: "B8",
     },
     {
-      id: "B1-208",
-      name: "B1-208",
+      id: "B9",
+      name: "B9",
     },
     {
-      id: "B1-209",
-      name: "B1-209",
+      id: "A1",
+      name: "A1",
     },
     {
-      id: "B1-210",
-      name: "B1-210",
+      id: "A2",
+      name: "A2",
     },
     {
-      id: "B4-304",
-      name: "B4-304",
+      id: "A3",
+      name: "A3",
     },
     {
-      id: "B8-205",
-      name: "B8-205",
+      id: "A4",
+      name: "A4",
     },
     {
-      id: "C4-504",
-      name: "C4-504",
+      id: "A5",
+      name: "A5",
     },
     {
-      id: "C4-306",
-      name: "C4-306",
+      id: "C4",
+      name: "C4",
     },
     {
-      id: "B2-310",
-      name: "B2-310",
+      id: "C5",
+      name: "C5",
     },
     {
-      id: "B5-103",
-      name: "B5-103",
-    },
-    {
-      id: "B9-301",
-      name: "B9-301",
-    },
-    {
-      id: "B2-202",
-      name: "B2-202",
-    },
-    {
-      id: "B3-112",
-      name: "B3-112",
-    },
-    {
-      id: "C6-301",
-      name: "C6-301",
-    },
+      id: "C6",
+      name: "C6",
+    }
   ];
 
-  const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
-  };
-
-  const handleSearch = () => {
-    if (!selectedDate) {
-      alert("Please select a date.");
-      return;
+  const floors = [
+    {
+      id: "",
+      name: "Choose floor"
+    },
+    {
+      id: "1",
+      name: "1"
+    },
+    {
+      id: "2",
+      name: "2"
+    },
+    {
+      id: "3",
+      name: "3"
+    },
+    {
+      id: "4",
+      name: "4"
+    },
+    {
+      id: "5",
+      name: "5"
+    },
+    {
+      id: "6",
+      name: "6"
     }
-    navigate(`/room/${selectedRoom}`);
-  };
+  ]
+
+  const handleApply = () => {
+    applyFilter(selectedBuilding, selectedFloor);
+  }
+
+  const handleClear = () => {
+    setSelectedBuilding("");
+    setSelectedFloor("");
+    clearFilter();
+  }
 
   return (
-    <div className="search-room">
-      <div className="search-form">
-        <Selection options={rooms} id="room" onChange={setSelectedRoom} />
-        <DateSelector selectedDate={selectedDate} handleDateChange={handleDateChange} />
+    <div className="filter-room">
+      <div className="filter-form">
+        <Selection options={buildings} id="room" value={selectedBuilding} onChange={setSelectedBuilding} />
+        <Selection options={floors} id="room" value={selectedFloor} onChange={setSelectedFloor} />
       </div>
-      <button className="search-button" onClick={handleSearch}>
-        <SearchIcon className="search-icon" />
-        <p>Search</p>
+      <button className="filter-button" onClick={handleApply}>
+        <FilterListIcon className="filter-icon" />
+      </button>
+      <button className="filter-button" onClick={handleClear}>
+        <FilterListOffIcon className="filter-icon" />
       </button>
     </div>
   );

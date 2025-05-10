@@ -3,19 +3,28 @@ import { useState } from 'react';
 
 const ScheduleContext = createContext({
     isScheduleOpen: false,
-    setIsScheduleOpen: () => {}
+    roomName: '',
+    setIsScheduleOpen: () => {},
+    setRoomName: () => {}
 });
 
 export const ScheduleProvider = ({ children }) => {
     const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+    const [roomName, setRoomName] = useState('');
 
     const toggleSchedule = () => {
         setIsScheduleOpen((prev) => !prev);
     };
 
+    const changeRoomName = (name) => {
+        setRoomName(name);
+    }
+
     const valueCtx = {
         isScheduleOpen,
-        toggleSchedule
+        roomName,
+        toggleSchedule,
+        changeRoomName
     };
 
     return (

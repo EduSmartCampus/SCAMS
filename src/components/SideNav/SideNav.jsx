@@ -3,10 +3,11 @@ import { NavLink } from "react-router-dom";
 import HomeIcon from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import EventIcon from '@mui/icons-material/Event';
 
 const SideNav = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const handleLogout = () => {
+    localStorage.removeItem("userInfo");
+  }
 
   return (
     <div className="layout-nav">
@@ -14,7 +15,7 @@ const SideNav = () => {
         SCAMS
       </div>
       <nav>
-        <NavLink to="/" className={({ isActive }) => isActive ? "navChild active" : "navChild"}>
+        <NavLink to="/home" className={({ isActive }) => isActive ? "navChild active" : "navChild"}>
           <HomeIcon />
           <p>Home</p>
         </NavLink>
@@ -22,7 +23,7 @@ const SideNav = () => {
           <SettingsIcon />
           <p>Setting</p>
         </NavLink>
-        <NavLink to="/login" className={({ isActive }) => isActive ? "navChild active" : "navChild"}>
+        <NavLink to="/login" className={({ isActive }) => isActive ? "navChild active" : "navChild"} onClick={handleLogout}>
           <LogoutIcon />
           <p>Logout</p>
         </NavLink>
