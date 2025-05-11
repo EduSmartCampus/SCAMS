@@ -5,6 +5,7 @@ import TimeSelector from "../TimeSelector/TimeSelector";
 import DateSelector from "../DateSelector/DateSelector";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import CloseIcon from '@mui/icons-material/Close';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useSchedule } from "../../context/ScheduleContext";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -15,6 +16,7 @@ const ScheduleRegistration = () => {
   const [startTime, setStartTime] = useState('07:00'); 
   const [endTime, setEndTime] = useState('08:00'); 
   const [selectedDate, setSelectedDate] = useState("");
+  const [isBooked, setIsBooked] = useState(false);
   const { isScheduleOpen, toggleSchedule, roomName } = useSchedule();
   const token = localStorage.getItem("authToken");
   const { id } = useParams();
@@ -23,31 +25,30 @@ const ScheduleRegistration = () => {
     e.preventDefault();
     
     if (userInfo == null) {
-      console.log("submit1")
       toast.error("You must be logged in as a lecturer to book a room.");
       return;
     }
 
     if (selectedDate == "" || subject == "") {
-      console.log("submit2")
       toast.error("Please fill in all required fields (Room ID, Date, Subject).");
       return;
     }
 
-    console.log("submit")
-
     try {
+      setIsBooked(true);
+
       const bookingData = {
         room_id: id,
         usedDate: selectedDate,
         startPeriod: parseInt(startTime.split(':')[0]),
         endPeriod: parseInt(endTime.split(':')[0]),
+        teacherId: userInfo.id,
         lectureTitle: subject,
       };
 
       const response = await axios.post("http://localhost:3000/schedules", bookingData, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
@@ -56,7 +57,11 @@ const ScheduleRegistration = () => {
         toast.success(
           `Room booked successfully for ${subject} on ${selectedDate} from ${startTime} to ${endTime}!`
         ); 
-        toggleSchedule(); 
+        setTimeout(() => {
+          toggleSchedule(); 
+          window.location.reload();
+          setIsBooked(false);
+        }, 2000)
       } else {
         toast.error("Failed to book the room. Please try again.");
       }
@@ -77,7 +82,8 @@ const ScheduleRegistration = () => {
     console.log(selectedDate);
     console.log(subject);
     console.log(userInfo)
-  }, [selectedDate, subject, userInfo])
+    console.log(token)
+  }, [selectedDate, subject, userInfo, token])
 
   return (
     <div className="outside-form">
@@ -97,7 +103,9 @@ const ScheduleRegistration = () => {
             <label>Subject: </label>
             <SubjectSelector subject={subject} handleSubjectChange={handleSubjectChange} />
           </div>
-          <button type="submit">Book Room</button>
+          <button type="submit" disabled={isBooked}>
+            {isBooked ? <CircularProgress size="16px" style={{'color': '#fff'}} /> : "Book Room"}
+          </button>
         </form>
       </div>
     </div>

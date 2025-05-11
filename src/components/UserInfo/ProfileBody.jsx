@@ -176,7 +176,9 @@ const ProfileBody = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="id">Student ID</label>
+            <label htmlFor="id">
+              {userInfo.type === "student" ? "Student ID" : userInfo.type === "lecturer" ? "Lecturer ID" : "Staff ID"}
+            </label>
             <input
                 type="text"
                 id="id"

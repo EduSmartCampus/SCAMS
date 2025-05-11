@@ -58,10 +58,10 @@ const RoomInfo = () => {
     const startHour = schedule.startPeriod;
     const endHour = schedule.endPeriod;
 
-    const start = new Date(schedule.date);
+    const start = new Date(schedule.usedDate);
     start.setHours(startHour, 0, 0, 0);
 
-    const end = new Date(schedule.date);
+    const end = new Date(schedule.usedDate);
     end.setHours(endHour, 0, 0, 0);
 
     return {
