@@ -121,7 +121,7 @@ const createSchedule = async (req, res) => {
       return res.status(403).json({ message: "Only lecturers can create schedules" });
     }
 
-    const { room_id, usedDate, startPeriod, endPeriod, lectureTitle } = req.body;
+    const { room_id, usedDate, startPeriod, endPeriod, lectureTitle, teacherId } = req.body;
 
     // Check for overlapping schedule
     const hasOverlap = await isScheduleOverlapping({ room_id, usedDate, startPeriod, endPeriod });
@@ -138,7 +138,7 @@ const createSchedule = async (req, res) => {
       usedDate,
       startPeriod,
       endPeriod,
-      teacherId: req.user.id,
+      teacherId,
       lectureTitle,
     });
 
@@ -151,7 +151,7 @@ const createSchedule = async (req, res) => {
       usedDate,
       startPeriod,
       endPeriod,
-      teacherId: req.user.id,
+      teacherId,
       lectureTitle
     });
 

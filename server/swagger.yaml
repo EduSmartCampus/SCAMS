@@ -414,6 +414,9 @@ paths:
                 lectureTitle:
                   type: string
                   example: "Toán rời rạc"
+                teacherId:
+                  type: interger
+                  example: 123456
       responses:
         "201":
           description: Tạo lịch học thành công
