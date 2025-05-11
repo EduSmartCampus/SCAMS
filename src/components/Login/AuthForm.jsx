@@ -46,7 +46,6 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
         if ((isForgotPassword && userData && !token) || pendingAuth) {
             // Handle OTP verification (only for login or forgot password)
             if (!otp.trim()) {
-
                 toast.error('Please enter a valid OTP.');
                 return;
             }
@@ -93,7 +92,6 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
                         navigate('/home');
                     }
                 } else {
-                    // setError('No token received from server');
                     toast.error('Invalid OTP. Please try again.');
                 }
             } else if (response.status === 401) {
@@ -123,10 +121,8 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
                 setError('');
                 toast.success('OTP sent to your email.');
             } else if (response.status === 401) {
-
                 toast.error('Email not found. Please check your email.');
             } else {
-
                 toast.error('An unexpected error occurred. Please try again later.');
             }
         } else {
@@ -158,6 +154,7 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
                         email,
                         type,
                         password,
+                        id: data.id || null, // Thêm id từ response của API
                     };
                     setPendingAuth({
                         userInfo,
@@ -179,7 +176,6 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
 
     const handleResetPassword = async () => {
         if (!newPassword.trim()) {
-
             toast.error('Please enter a new password.');
             return;
         }
@@ -217,10 +213,8 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
                     setNewPassword('');
                 }, 1000);
             } else if (response.status === 400) {
-
                 toast.error('Email does not exist. Please try again.');
             } else {
-
                 toast.error(`Failed to reset password: ${data.message || 'Please try again later.'}`);
             }
         } else {
