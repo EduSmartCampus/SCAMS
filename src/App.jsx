@@ -6,8 +6,9 @@ import Setting from './pages/Setting';
 import Login from './pages/Login';
 import RoomInformation from './pages/RoomInformation';
 import ScheduleRegistration from './components/ScheduleRegistration/ScheduleRegistration.jsx';
-import UserInfo from './pages/UserInfo.jsx'
+import UserInfo from './pages/UserInfo.jsx';
 import LandingPage from './components/LandingPage/LandingPage';
+import RoomEdit from './pages/RoomEdit.jsx';
 import { ToastContainer } from 'react-toastify';
 
 function App() {
@@ -30,8 +31,10 @@ function App() {
           <Route path="/setting" element={<UserInfo />} />
           <Route path='/room/:id' element={<RoomInformation />} />
           <Route path='/schedule-registration/:id' element={<ScheduleRegistration />} />
+            <Route path="/room-edit" element={<RoomEdit />} />
         </Route>
         <Route path="/login" element={<Login />} />
+
       </Routes>
     </BrowserRouter>
   );
