@@ -167,21 +167,22 @@ const updateSchedule = async (req, res) => {
     const scheduleId = req.params.id;
     const schedule = await Schedule.findOne( { id: scheduleId } );
 
-    if (!schedule) {
-      return res.status(404).json({ message: "Schedule not found" });
-    }
-
-    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId) {
-      return res.status(403).json({ message: "Not authorized to edit this schedule" });
-    }
-
     const {
       room_id,
       usedDate,
       startPeriod,
       endPeriod,
       lectureTitle,
+      teacherId
     } = req.body
+
+    if (!schedule) {
+      return res.status(404).json({ message: "Schedule not found" });
+    }
+
+    if (req.user.type !== 'lecturer' || teacherId !== schedule.teacherId) {
+      return res.status(403).json({ message: "Not authorized to edit this schedule" });
+    }
 
     // Check for overlapping schedule
     const hasOverlap = await isScheduleOverlapping({
@@ -191,6 +192,7 @@ const updateSchedule = async (req, res) => {
       endPeriod,
       excludeId: scheduleId,
     });
+
     if (hasOverlap) {
       return res.status(400).json({ message: "Schedule overlaps with existing schedule" });
     }
@@ -224,7 +226,9 @@ const deleteSchedule = async (req, res) => {
       return res.status(404).json({ message: "Schedule not found" });
     }
 
-    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId) {
+    const { teacherId } = req.body;
+
+    if (req.user.type !== 'lecturer' || teacherId !== schedule.teacherId) {
       return res.status(403).json({ message: "Not authorized to delete this schedule" });
     }
 

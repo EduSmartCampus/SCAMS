@@ -503,6 +503,9 @@ paths:
                 lectureTitle:
                   type: string
                   example: "Toán rời rạc"
+                teacherId:
+                  type: integer
+                  example: 123456
       responses:
         "200":
           description: Cập nhật thành công
@@ -523,6 +526,16 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teacherId:
+                  type: integer
+                  example: 123456
       responses:
         "200":
           description: Xoá thành công
