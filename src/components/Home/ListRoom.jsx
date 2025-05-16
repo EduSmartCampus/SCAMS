@@ -20,7 +20,6 @@ const ListRoom = () => {
         },
       });
 
-      console.log(response);
       setRooms(response.data);
     } catch (error) {
       toast.error("Error fetching rooms");
