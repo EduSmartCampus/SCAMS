@@ -9,7 +9,6 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, getDay } from "date-fns";
 import vi from "date-fns/locale/vi";
-import CloseIcon from '@mui/icons-material/Close';
 import { useSchedule } from "../../context/ScheduleContext";
 import { useFilter } from "../../context/FilterContext";
 
@@ -26,10 +25,9 @@ const RoomInfo = () => {
   const [roomInfo, setRoomInfo] = useState({});
   const [schedules, setSchedules] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const { id } = useParams();
   const token = localStorage.getItem("authToken");
-  const { changeRoomName } = useSchedule();
+  const { isEdit, selectedEvent, changeRoomName, setSelectedEvent } = useSchedule();
   const { clearFilter } = useFilter();
 
   const fetchRoomInfo = async () => {
@@ -41,7 +39,6 @@ const RoomInfo = () => {
         },
       });
       console.log(response.data);
-      console.log(token)
       setSchedules(response.data.schedules);
       setRoomInfo(response.data.room);
       changeRoomName(response.data.room.name);
@@ -65,9 +62,10 @@ const RoomInfo = () => {
     end.setHours(endHour, 0, 0, 0);
 
     return {
-      id: schedule._id,
+      id: schedule.id,
       title: schedule.lectureTitle,
       lecturer_name: schedule.teacherName,
+      lecturer_id: schedule.teacherId,
       room_name: schedule.roomName,
       start,
       end,
@@ -153,30 +151,6 @@ const RoomInfo = () => {
           onSelectEvent={(event) => handleEventClick(event)}
         />
       </div>
-      {selectedEvent && (
-        <div className="event-popup">
-          <div className="popup-content">
-            <button className="close-icon" onClick={() => setSelectedEvent(null)}>
-              <CloseIcon className="icon" />
-            </button>
-            <h3>{selectedEvent.title}</h3>
-            <p>{selectedEvent.room_name}</p>
-            <p>
-              Time:{" "}
-              {selectedEvent.start.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-              -{" "}
-              {selectedEvent.end.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-            <p>Lecturer name: {selectedEvent.lecturer_name}</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -3,9 +3,11 @@ import { Outlet } from "react-router-dom";
 import SideNav from "../components/SideNav/SideNav";
 import ScheduleRegistration from '../components/ScheduleRegistration/ScheduleRegistration';
 import { useSchedule } from '../context/ScheduleContext';
+import ScheduleInfo from '../components/RoomInformation/ScheduleInfo';
+import EditSchedule from '../components/RoomInformation/EditSchedule';
 
 const Layout = () => {  
-  const { isScheduleOpen } = useSchedule();
+  const { isScheduleOpen, isEdit, selectedEvent } = useSchedule();
 
   return (
     <main className="layout">
@@ -14,6 +16,8 @@ const Layout = () => {
         <Outlet />
       </div>
       {isScheduleOpen && <ScheduleRegistration />}
+      {selectedEvent && <ScheduleInfo />}
+      {isEdit && <EditSchedule />}
     </main>
   );
 };

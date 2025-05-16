@@ -4,13 +4,19 @@ import { useState } from 'react';
 const ScheduleContext = createContext({
     isScheduleOpen: false,
     roomName: '',
+    isEdit: false,
+    selectedEvent: null,
     setIsScheduleOpen: () => {},
-    setRoomName: () => {}
+    setRoomName: () => {},
+    toggleEdit: () => {},
+    setSelectedEvent: () => {}
 });
 
 export const ScheduleProvider = ({ children }) => {
     const [isScheduleOpen, setIsScheduleOpen] = useState(false);
     const [roomName, setRoomName] = useState('');
+    const [isEdit, setIsEdit] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     const toggleSchedule = () => {
         setIsScheduleOpen((prev) => !prev);
@@ -20,11 +26,19 @@ export const ScheduleProvider = ({ children }) => {
         setRoomName(name);
     }
 
+    const toggleEdit = () => {
+        setIsEdit((prev) => !prev);
+    }
+
     const valueCtx = {
         isScheduleOpen,
         roomName,
+        isEdit,
+        selectedEvent,
         toggleSchedule,
-        changeRoomName
+        changeRoomName,
+        toggleEdit,
+        setSelectedEvent
     };
 
     return (

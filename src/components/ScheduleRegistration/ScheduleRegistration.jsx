@@ -82,8 +82,7 @@ const ScheduleRegistration = () => {
     console.log(selectedDate);
     console.log(subject);
     console.log(userInfo)
-    console.log(token)
-  }, [selectedDate, subject, userInfo, token])
+  }, [selectedDate, subject, userInfo])
 
   return (
     <div className="outside-form">
