@@ -49,6 +49,8 @@
     .schedule-list {
       list-style: none;
       padding: 0;
+      overflow: auto;
+      height: 15vh;
 
       .schedule-item {
         padding: 1rem;

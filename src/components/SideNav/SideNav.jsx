@@ -40,7 +40,7 @@ const SideNav = () => {
           {isLecturer && (
               <>
                 <NavLink
-                    to="/room"
+                    to="/room-edit"
                     className={({ isActive }) => (isActive ? "navChild active" : "navChild")}
                 >
                   <MeetingRoomIcon />
