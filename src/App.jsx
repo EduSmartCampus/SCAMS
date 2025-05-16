@@ -31,7 +31,7 @@ function App() {
           <Route path="/setting" element={<UserInfo />} />
           <Route path='/room/:id' element={<RoomInformation />} />
           <Route path='/schedule-registration/:id' element={<ScheduleRegistration />} />
-            <Route path="/room-edit" element={<RoomEdit />} />
+          <Route path="/room-edit" element={<RoomEdit />} />
         </Route>
         <Route path="/login" element={<Login />} />
 

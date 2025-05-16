@@ -78,11 +78,11 @@ const ScheduleRegistration = () => {
     setSubject(event.target.value);
   }
 
-  useEffect(() => {
-    console.log(selectedDate);
-    console.log(subject);
-    console.log(userInfo)
-  }, [selectedDate, subject, userInfo])
+  // useEffect(() => {
+  //   console.log(selectedDate);
+  //   console.log(subject);
+  //   console.log(userInfo)
+  // }, [selectedDate, subject, userInfo])
 
   return (
     <div className="outside-form">

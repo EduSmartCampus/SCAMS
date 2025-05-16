@@ -27,7 +27,7 @@ const RoomInfo = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { id } = useParams();
   const token = localStorage.getItem("authToken");
-  const { isEdit, selectedEvent, changeRoomName, setSelectedEvent } = useSchedule();
+  const { changeRoomName, setSelectedEvent } = useSchedule();
   const { clearFilter } = useFilter();
 
   const fetchRoomInfo = async () => {
@@ -38,7 +38,6 @@ const RoomInfo = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
       setSchedules(response.data.schedules);
       setRoomInfo(response.data.room);
       changeRoomName(response.data.room.name);

@@ -26,7 +26,6 @@ const EditSchedule = () => {
   const [endTime, setEndTime] = useState(formatTime(selectedEvent.end));
   const [selectedDate, setSelectedDate] = useState("");
   const [isUpdate, setIsUpdate] = useState(false);
-  const { id } = useParams();
   const token = localStorage.getItem("authToken");
   const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 
@@ -57,11 +56,19 @@ const EditSchedule = () => {
         return;
     }
 
+    const selectedRoomObj = listRoom.find((r) => r.name == room);
+    const roomId = selectedRoomObj?._id;
+
+    if (!roomId) {
+        toast.error("Invalid room ID.");
+        return;
+    }
+
     try {
         setIsUpdate(true);
   
         const updatingData = {
-          room_id: id,
+          room_id: roomId,
           usedDate: selectedDate,
           startPeriod: parseInt(startTime.split(':')[0]),
           endPeriod: parseInt(endTime.split(':')[0]),

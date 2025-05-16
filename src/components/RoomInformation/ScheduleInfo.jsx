@@ -67,7 +67,7 @@ const ScheduleInfo = () => {
             minute: "2-digit",
           })}
         </p>
-        <p>Lecturer name: {selectedEvent.lecturer_name}</p>
+        <p>Lecturer ID: {selectedEvent.lecturer_id}</p>
         {userInfo?.type === "lecturer" &&
           userInfo?.id === selectedEvent.lecturer_id && (
             <div className="btn-edit-delete">

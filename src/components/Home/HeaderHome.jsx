@@ -1,13 +1,13 @@
 import './HeaderHome.scss'
 import SearchBar from "../SearchBar/SearchBar";
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 
 const HeaderHome = () => {
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 
-    useEffect(() => {
-        console.log('userInfo', userInfo)
-    }, [userInfo])
+    // useEffect(() => {
+    //     console.log('userInfo', userInfo)
+    // }, [userInfo])
 
     return (
         <div className='header'>
