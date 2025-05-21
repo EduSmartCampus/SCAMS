@@ -16,6 +16,8 @@ const ScheduleInfo = () => {
 
     const handleDeleteSchedule = async () => {
         try {
+            if (!window.confirm('Are you sure you want to delete this schedule?')) return;
+
             setIsDelete(true);
 
             const response = await axios.delete(`http://localhost:3000/schedules/${selectedEvent.id}`, {
@@ -67,7 +69,7 @@ const ScheduleInfo = () => {
             minute: "2-digit",
           })}
         </p>
-        <p>Lecturer ID: {selectedEvent.lecturer_id}</p>
+        <p>Lecturer name: {selectedEvent.lecturer_name}</p>
         {userInfo?.type === "lecturer" &&
           userInfo?.id === selectedEvent.lecturer_id && (
             <div className="btn-edit-delete">

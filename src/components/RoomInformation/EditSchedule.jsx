@@ -9,7 +9,6 @@ import TimeSelector from "../TimeSelector/TimeSelector";
 import DateSelector from "../DateSelector/DateSelector";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import CircularProgress from '@mui/material/CircularProgress';
-import { useParams } from "react-router-dom";
 
 const EditSchedule = () => {
   const formatTime = (date) => {
@@ -20,7 +19,7 @@ const EditSchedule = () => {
 
   const { selectedEvent, roomName, toggleEdit } = useSchedule();
   const [listRoom, setListRoom] = useState([]);
-  const [room, setRoom] = useState(roomName);
+  const [room, setRoom] = useState(selectedEvent.room_name);
   const [subject, setSubject] = useState(selectedEvent.title);
   const [startTime, setStartTime] = useState(formatTime(selectedEvent.start));
   const [endTime, setEndTime] = useState(formatTime(selectedEvent.end));

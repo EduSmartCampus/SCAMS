@@ -5,13 +5,17 @@ const SubjectSelector = ({ handleSubjectChange, subject }) => {
       "Calculus 1",
       "Calculus 2",
       "English 1",
+      "Physical 1",
+      "Linear Algebra",
       "Software Engineer",
       "Advance Software Engineer",
       "Database Management",
       "Computer Architecture",
-      "Physical 1",
       "Data Structure and Algorithm",
       "Operating System",
+      "Digital Systems",
+      "Programming Fundamentals",
+      "Principles of Programming Languages"
     ];
 
   return (
