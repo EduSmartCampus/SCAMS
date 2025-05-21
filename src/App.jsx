@@ -10,6 +10,7 @@ import UserInfo from './pages/UserInfo.jsx';
 import LandingPage from './components/LandingPage/LandingPage';
 import RoomEdit from './pages/RoomEdit.jsx';
 import { ToastContainer } from 'react-toastify';
+import LecturerSchedule from './pages/LecturerSchedule.jsx';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path='/room/:id' element={<RoomInformation />} />
           <Route path='/schedule-registration/:id' element={<ScheduleRegistration />} />
           <Route path="/room-edit" element={<RoomEdit />} />
+          <Route path="/schedule/:id" element={<LecturerSchedule />} />
         </Route>
         <Route path="/login" element={<Login />} />
 

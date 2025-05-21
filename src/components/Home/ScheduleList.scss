@@ -1,5 +1,4 @@
 .schedule-list {
-    padding: 20px;
     margin-top: 20px;
 
     h1 {
@@ -51,5 +50,11 @@
             color: #666;
             margin: 0;
         }
+    }
+
+    .list-sched {
+        height: 320px;
+        overflow: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 } 

@@ -50,16 +50,16 @@ $border-radius: 8px;
     }  
     
     .calender {
-        height: 70vh;
+        height: 60vh;
         margin: 20px 0;
         width: 100%;
 
         @media (max-width: 1050px) {
-            height: 65vh;
+            height: 55vh;
         }
 
         @media (max-width: 600px) {
-            height: 60vh;
+            height: 50vh;
         }
 
     }          

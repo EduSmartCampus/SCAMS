@@ -11,6 +11,14 @@ const TimeSelector = ({ startTime, endTime, setStartTime, setEndTime }) => {
     const handleStartTimeChange = (e) => {
         const newStartTime = e.target.value;
         setStartTime(newStartTime);
+
+        const [hour] = newStartTime.split(":").map(Number);
+        const nextHour = Math.min(hour + 1, 22);
+        const nextTime = `${nextHour.toString().padStart(2, "0")}:00`;
+
+        if (parseInt(endTime.split(":")[0]) <= hour) {
+            setEndTime(nextTime);
+        }
     };
 
     const handleEndTimeChange = (e) => {

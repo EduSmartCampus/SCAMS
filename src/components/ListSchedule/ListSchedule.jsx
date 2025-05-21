@@ -1,16 +1,12 @@
-import "./RoomInfo.scss";
-import Room from "../Room/Room";
-import { Link, useParams } from "react-router-dom";
-import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
-import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import "./ListSchedule.scss";
+import { toast } from "react-toastify";
 import axios from "axios";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, getDay } from "date-fns";
 import vi from "date-fns/locale/vi";
 import { useSchedule } from "../../context/ScheduleContext";
-import { useFilter } from "../../context/FilterContext";
 import NotedStatus from "../NotedStatus/NotedStatus";
 
 const locales = { vi: vi };
@@ -22,38 +18,38 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const RoomInfo = () => {
-  const [roomInfo, setRoomInfo] = useState({});
-  const [schedules, setSchedules] = useState([]);
+const ListSchedule = () => {
+  const [schedule, setSchedule] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { id } = useParams();
+  const { setSelectedEvent } = useSchedule();
+  const userInfo = localStorage.getItem("userInfo")
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : null;
   const token = localStorage.getItem("authToken");
-  const { changeRoomName, setSelectedEvent } = useSchedule();
-  const { clearFilter } = useFilter();
 
-  const fetchRoomInfo = async () => {
+  const fetchSchedule = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/rooms/${id}`, {
+      const response = await axios.get("http://localhost:3000/schedules", {
+        params: {
+          teacherId: userInfo.id,
+        },
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
 
-      setSchedules(response.data.schedules);
-      setRoomInfo(response.data.room);
-      changeRoomName(response.data.room.name);
+      console.log(response.data);
+      setSchedule(response.data);
     } catch (error) {
-      toast.error("Fetch room information failed!");
+      toast.error("Something wrong that can not fetch!");
     }
   };
 
   useEffect(() => {
-    fetchRoomInfo();
+    fetchSchedule();
   }, []);
 
-  const events = schedules.map((schedule) => {
+  const events = schedule.map((schedule) => {
     const startHour = schedule.startPeriod;
     const endHour = schedule.endPeriod;
 
@@ -68,7 +64,7 @@ const RoomInfo = () => {
       title: schedule.lectureTitle,
       lecturer_name: schedule.teacher_name,
       lecturer_id: schedule.teacherId,
-      room_name: schedule.roomName,
+      room_name: schedule.room_name,
       start,
       end,
     };
@@ -125,12 +121,7 @@ const RoomInfo = () => {
   };
 
   return (
-    <div className="room-info">
-      <Link to="/home" className="back" onClick={clearFilter}>
-        <KeyboardBackspaceIcon className="back-icon" />
-        <p>Back to home page</p>
-      </Link>
-      <Room roomInfo={roomInfo} />
+    <div>
       <div style={{ margin: "10px 0" }}>
         <label>Choose a day: </label>
         <input
@@ -139,33 +130,33 @@ const RoomInfo = () => {
           value={format(currentDate, "yyyy-MM-dd")}
           className="date-change"
         />
-      </div>
-      <NotedStatus />
-      <div className="calender">
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          titleAccessor="title"
-          defaultView="week"
-          views={["week"]}
-          showMultiDayTimes={false}
-          allDayAccessor={() => false}
-          style={{ height: "100%" }}
-          eventPropGetter={eventStyleGetter}
-          formats={formats}
-          popup
-          date={currentDate}
-          onNavigate={handleNavigate}
-          min={new Date(2025, 0, 1, 7, 0)}
-          max={new Date(2025, 0, 1, 23, 0)}
-          scrollToTime={new Date(2025, 1, 1, 7, 0, 0)}
-          onSelectEvent={(event) => handleEventClick(event)}
-        />
+        <NotedStatus />
+        <div className="calender">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            titleAccessor="title"
+            defaultView="week"
+            views={["week"]}
+            showMultiDayTimes={false}
+            allDayAccessor={() => false}
+            style={{ height: "100%" }}
+            eventPropGetter={eventStyleGetter}
+            formats={formats}
+            popup
+            date={currentDate}
+            onNavigate={handleNavigate}
+            min={new Date(2025, 0, 1, 7, 0)}
+            max={new Date(2025, 0, 1, 23, 0)}
+            scrollToTime={new Date(2025, 1, 1, 7, 0, 0)}
+            onSelectEvent={(event) => handleEventClick(event)}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
-export default RoomInfo;
+export default ListSchedule;

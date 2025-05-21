@@ -3,12 +3,14 @@ import { NavLink } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import MeetingRoomIcon from "@mui/icons-material/MeetingRoom"; // Icon for Room
+import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const SideNav = () => {
   // Retrieve userInfo from localStorage
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-  const isStaff = userInfo.type === "staff"; // Check if role is lecturer
+  const isStaff = userInfo.type === "staff"; // Check if role is staff
+  const isLecturer = userInfo.type === "lecturer";
 
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
@@ -47,6 +49,17 @@ const SideNav = () => {
           >
             <MeetingRoomIcon />
             <p>Room</p>
+          </NavLink>
+        )}
+        {isLecturer && (
+          <NavLink
+            to={`/schedule/${userInfo.id}`}
+            className={({ isActive }) =>
+              isActive ? "navChild active" : "navChild"
+            }
+          >
+            <CalendarMonthIcon />
+            <p>Lecturer Schedule</p>
           </NavLink>
         )}
         <NavLink
