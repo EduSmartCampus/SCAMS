@@ -16,6 +16,27 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
     const formRef = useRef(null);
     const emailInputRef = useRef(null);
 
+    // Password validation function
+    const validatePassword = (password) => {
+        // Check requirements in order
+        if (password.length < 8) {
+            return { isValid: false, message: 'Password must be at least 8 characters long.' };
+        }
+        if (!/[A-Z]/.test(password)) {
+            return { isValid: false, message: 'Password must contain at least one uppercase letter.' };
+        }
+        if (!/[a-z]/.test(password)) {
+            return { isValid: false, message: 'Password must contain at least one lowercase letter.' };
+        }
+        if (!/[0-9]/.test(password)) {
+            return { isValid: false, message: 'Password must contain at least one number.' };
+        }
+        if (!/[^A-Za-z0-9]/.test(password)) {
+            return { isValid: false, message: 'Password must contain at least one special character.' };
+        }
+        return { isValid: true, message: '' };
+    };
+
     // Reset error when state changes
     useEffect(() => {
         setError('');
@@ -41,6 +62,15 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
         if (!isForgotPassword && !pendingAuth && !form.checkValidity()) {
             form.reportValidity();
             return;
+        }
+
+        // Validate password for signup
+        if (isSignUp && password) {
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.isValid) {
+                toast.error(passwordValidation.message);
+                return;
+            }
         }
 
         if ((isForgotPassword && userData && !token) || pendingAuth) {
@@ -154,7 +184,7 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
                         email,
                         type,
                         password,
-                        id: data.id || null, // Thêm id từ response của API
+                        id: data.id || null,
                     };
                     setPendingAuth({
                         userInfo,
@@ -177,6 +207,13 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
     const handleResetPassword = async () => {
         if (!newPassword.trim()) {
             toast.error('Please enter a new password.');
+            return;
+        }
+
+        // Validate new password for reset
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.isValid) {
+            toast.error(passwordValidation.message);
             return;
         }
 
