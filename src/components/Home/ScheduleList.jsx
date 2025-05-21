@@ -14,7 +14,26 @@ const ScheduleList = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [roomFilter, setRoomFilter] = useState('');
     const [lecturerFilter, setLecturerFilter] = useState('');
+    const [lecturers, setLecturers] = useState({});
     const token = localStorage.getItem('authToken');
+
+    const fetchLecturers = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/lecturers', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const lecturerMap = {};
+            response.data.forEach(lecturer => {
+                lecturerMap[lecturer.id] = lecturer;
+            });
+            setLecturers(lecturerMap);
+        } catch (error) {
+            toast.error('Error fetching lecturers');
+        }
+    };
 
     const fetchSchedules = async () => {
         try {
@@ -26,6 +45,7 @@ const ScheduleList = () => {
             });
             setSchedules(response.data);
             setFilteredSchedules(response.data);
+            console.log('Schedules:', response.data);
         } catch (error) {
             toast.error('Error fetching schedules');
         }
@@ -34,6 +54,7 @@ const ScheduleList = () => {
     useEffect(() => {
         if (token) {
             fetchSchedules();
+            fetchLecturers();
         }
     }, [token]);
 
@@ -43,24 +64,25 @@ const ScheduleList = () => {
         if (selectedDate) {
             const dateStr = selectedDate.toISOString().split('T')[0];
             filtered = filtered.filter(schedule => 
-                schedule.date.split('T')[0] === dateStr
+                (schedule.date || '').split('T')[0] === dateStr
             );
         }
 
         if (roomFilter) {
             filtered = filtered.filter(schedule => 
-                schedule.room_id.toLowerCase().includes(roomFilter.toLowerCase())
+                (schedule.room_id || '').toLowerCase().includes(roomFilter.toLowerCase())
             );
         }
 
         if (lecturerFilter) {
-            filtered = filtered.filter(schedule => 
-                schedule.lecturer_id.toLowerCase().includes(lecturerFilter.toLowerCase())
-            );
+            filtered = filtered.filter(schedule => {
+                const lecturer = lecturers[schedule.teacherId];
+                return lecturer && (lecturer.name || '').toLowerCase().includes(lecturerFilter.toLowerCase());
+            });
         }
 
         setFilteredSchedules(filtered);
-    }, [selectedDate, roomFilter, lecturerFilter, schedules]);
+    }, [selectedDate, roomFilter, lecturerFilter, schedules, lecturers]);
 
     if (!token) return null;
 
@@ -86,7 +108,7 @@ const ScheduleList = () => {
                 />
                 
                 <TextField
-                    label="Filter by Lecturer ID"
+                    label="Filter by Lecturer Name"
                     value={lecturerFilter}
                     onChange={(e) => setLecturerFilter(e.target.value)}
                     size="small"
@@ -99,16 +121,20 @@ const ScheduleList = () => {
                 </div>
             ) : (
                 <Grid container spacing={2}>
-                    {filteredSchedules.map((schedule) => (
-                        <Grid item xs={12} sm={6} md={4} key={schedule._id}>
-                            <div className="schedule-card">
-                                <h3>Room: {schedule.room_id}</h3>
-                                <p>Lecturer: {schedule.lecturer_id}</p>
-                                <p>Date: {new Date(schedule.date).toLocaleDateString()}</p>
-                                <p>Time: {schedule.start_time} - {schedule.end_time}</p>
-                            </div>
-                        </Grid>
-                    ))}
+                    {filteredSchedules.map((schedule) => {
+                        const lecturer = lecturers[schedule.teacherId];
+                        return (
+                            <Grid item xs={12} sm={6} md={4} key={schedule._id || schedule.id}>
+                                <div className="schedule-card">
+                                    <h3>Room: {schedule.room_id}</h3>
+                                    <p>Lecturer: {lecturer ? lecturer.name : (schedule.teacherId || '-')}</p>
+                                    <p>Date: {schedule.date ? new Date(schedule.date).toLocaleDateString() : '-'}</p>
+                                    <p>Time: {(schedule.startPeriod && schedule.endPeriod) ? `${schedule.startPeriod} - ${schedule.endPeriod}` : '-'}</p>
+                                    <p>Lecture: {schedule.lectureTitle || '-'}</p>
+                                </div>
+                            </Grid>
+                        );
+                    })}
                 </Grid>
             )}
         </div>
