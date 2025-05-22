@@ -14,27 +14,7 @@ const ScheduleList = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [roomFilter, setRoomFilter] = useState("");
   const [lecturerFilter, setLecturerFilter] = useState("");
-  const [lecturers, setLecturers] = useState({});
   const token = localStorage.getItem("authToken");
-
-  const fetchLecturers = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/lecturers", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const lecturerMap = {};
-      response.data.forEach((lecturer) => {
-        lecturerMap[lecturer.id] = lecturer;
-      });
-      setLecturers(lecturerMap);
-      console.log("Lecturers:", lecturerMap);
-    } catch (error) {
-      toast.error("Error fetching lecturers");
-    }
-  };
 
   const fetchSchedules = async () => {
     try {
@@ -55,7 +35,6 @@ const ScheduleList = () => {
   useEffect(() => {
     if (token) {
       fetchSchedules();
-      fetchLecturers();
     }
   }, [token]);
 
@@ -63,10 +42,13 @@ const ScheduleList = () => {
     let filtered = [...schedules];
 
     if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split("T")[0];
-      filtered = filtered.filter(
-        (schedule) => (schedule.date || "").split("T")[0] === dateStr
-      );
+      const selectedDateStr = selectedDate.toISOString().split('T')[0];
+      filtered = filtered.filter((schedule) => {
+        if (!schedule.date) return false;
+        const scheduleDate = new Date(schedule.date);
+        const scheduleDateStr = scheduleDate.toISOString().split('T')[0];
+        return scheduleDateStr === selectedDateStr;
+      });
     }
 
     if (roomFilter) {
@@ -77,13 +59,12 @@ const ScheduleList = () => {
 
     if (lecturerFilter) {
       filtered = filtered.filter((schedule) => {
-        const lecturer = lecturers[schedule.teacherId];
-        return lecturer && (lecturer.name || "").toLowerCase().includes(lecturerFilter.toLowerCase());
+        return String(schedule.teacherId || "").includes(lecturerFilter);
       });
     }
 
     setFilteredSchedules(filtered);
-  }, [selectedDate, roomFilter, lecturerFilter, schedules, lecturers]);
+  }, [selectedDate, roomFilter, lecturerFilter, schedules]);
 
   if (!token) return null;
 
@@ -109,7 +90,7 @@ const ScheduleList = () => {
         />
 
         <TextField
-          label="Filter by Lecturer Name"
+          label="Filter by Lecturer ID"
           value={lecturerFilter}
           onChange={(e) => setLecturerFilter(e.target.value)}
           size="small"
@@ -123,12 +104,11 @@ const ScheduleList = () => {
       ) : (
         <Grid container spacing={2} justifyContent="center">
           {filteredSchedules.map((schedule) => {
-            const lecturer = lecturers[schedule.teacherId];
             return (
               <Grid item xs={12} sm={6} md={4} key={schedule._id || schedule.id}>
                 <div className="schedule-card">
                   <h3>Room: {schedule.room_id || "-"}</h3>
-                  <p>Lecturer: {lecturer ? lecturer.name : (schedule.teacherId || "-")}</p>
+                  <p>Lecturer: {schedule.teacherId || "-"}</p>
                   <p>Date: {schedule.date ? new Date(schedule.date).toLocaleDateString() : "-"}</p>
                   <p>Time: {(schedule.startPeriod && schedule.endPeriod) ? `${schedule.startPeriod} - ${schedule.endPeriod}` : "-"}</p>
                   <p>Lecture: {schedule.lectureTitle || "-"}</p>
