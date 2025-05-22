@@ -3,18 +3,19 @@ import { NavLink } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const SideNav = () => {
   // Retrieve userInfo from localStorage
-  const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-  const isStaff = userInfo.type === "staff"; // Check if role is staff
-  const isLecturer = userInfo.type === "lecturer";
+  const userInfo = localStorage.getItem("userInfo")
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : null;
+  // const isStaff = userInfo.type === "staff"; // Check if role is staff
+  const isLecturer = userInfo?.type === "lecturer";
 
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
-    localStorage.removeItem("authToken"); // Optional: Clear authToken on logout
+    localStorage.removeItem("authToken");
   };
 
   return (
@@ -30,7 +31,7 @@ const SideNav = () => {
           <HomeIcon />
           <p>Home</p>
         </NavLink>
-        <NavLink
+        {userInfo && <NavLink
           to="/setting"
           className={({ isActive }) =>
             isActive ? "navChild active" : "navChild"
@@ -38,9 +39,9 @@ const SideNav = () => {
         >
           <SettingsIcon />
           <p>Setting</p>
-        </NavLink>
+        </NavLink>}
         {/* Conditionally render Room and User links for lecturer role */}
-        {isStaff && (
+        {/* {isStaff && (
           <NavLink
             to="/room-edit"
             className={({ isActive }) =>
@@ -50,7 +51,7 @@ const SideNav = () => {
             <MeetingRoomIcon />
             <p>Room</p>
           </NavLink>
-        )}
+        )} */}
         {isLecturer && (
           <NavLink
             to={`/schedule/${userInfo.id}`}

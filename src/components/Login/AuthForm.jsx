@@ -269,24 +269,15 @@ const AuthForm = ({ isSignUp, setIsSignUp }) => {
         setNewPassword('');
     };
 
+    const handleLoginGuest = () => {
+        navigate('/home');
+    }
+
     return (
         <div className={`form-container ${isSignUp ? 'sign-up' : 'sign-in'}`}>
             <form ref={formRef}>
                 <h1>{isSignUp ? 'Create Account' : 'Sign In'}</h1>
-                <div className="social-icons">
-                    <a href="#" className="icon">
-                        <i className="fab fa-google"></i>
-                    </a>
-                    <a href="#" className="icon">
-                        <i className="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" className="icon">
-                        <i className="fab fa-github"></i>
-                    </a>
-                    <a href="#" className="icon">
-                        <i className="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
+                <button className='login-guest' onClick={handleLoginGuest}>Login with Guest</button>
                 <span>{isSignUp ? 'or use your email for registration' : 'or use your email'}</span>
                 {error && <p className="error-message">{error}</p>}
                 {!isForgotPassword && !pendingAuth && (

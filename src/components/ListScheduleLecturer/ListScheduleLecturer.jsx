@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./ListSchedule.scss";
+import "./ListScheduleLecturer.scss";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
@@ -18,7 +18,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const ListSchedule = () => {
+const ListScheduleLecturer = () => {
   const [schedule, setSchedule] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const { setSelectedEvent } = useSchedule();
@@ -159,4 +159,4 @@ const ListSchedule = () => {
   );
 };
 
-export default ListSchedule;
+export default ListScheduleLecturer;

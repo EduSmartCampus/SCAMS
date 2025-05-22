@@ -16,6 +16,32 @@
             min-width: 200px;
             height: 40px;
         }
+
+        .filter-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            font-size: 1rem;
+            background: linear-gradient(to left, #0a75ad, #75acd5);
+            color: #fff;
+            padding: 7px 10px;
+            border-radius: 30px;
+            height: fit-content;
+            border: none;
+    
+            .filter-icon {
+                border-radius: 20px;
+                width: 40px;
+                padding: 2px;
+                background-color: #fff;
+                color: #000;
+            }
+    
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     .schedule-card {
@@ -53,7 +79,8 @@
     }
 
     .list-sched {
-        height: 320px;
+        padding: 10px 0px;
+        height: 45vh;
         overflow: auto;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }

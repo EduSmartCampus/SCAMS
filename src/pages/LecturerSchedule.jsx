@@ -1,11 +1,11 @@
-import ListSchedule from "../components/ListSchedule/ListSchedule";
+import ListScheduleLecturer from "../components/ListScheduleLecturer/ListScheduleLecturer";
 import './LecturerSchedule.scss'
 
 const LecturerSchedule = () => {
     return (
         <div className="schedule">
             <h1>Lecturer Schedule</h1>
-            <ListSchedule />
+            <ListScheduleLecturer />
         </div>
     )
 }

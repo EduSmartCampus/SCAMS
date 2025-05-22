@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Grid from "@mui/material/Grid";
@@ -6,11 +6,11 @@ import TextField from "@mui/material/TextField";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import "./ScheduleList.scss";
 
 const ScheduleList = () => {
   const [schedules, setSchedules] = useState([]);
-  const [filteredSchedules, setFilteredSchedules] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [roomFilter, setRoomFilter] = useState("");
   const [lecturerFilter, setLecturerFilter] = useState("");
@@ -25,48 +25,57 @@ const ScheduleList = () => {
         },
       });
       setSchedules(response.data);
-      setFilteredSchedules(response.data);
       console.log("Schedules:", response.data);
     } catch (error) {
       toast.error("Error fetching schedules");
     }
   };
 
-  useEffect(() => {
-    if (token) {
-      fetchSchedules();
-    }
-  }, [token]);
+  const handleClear = () => {
+    setSelectedDate(null);
+    setRoomFilter("");
+    setLecturerFilter("");
+  };
 
   useEffect(() => {
-    let filtered = [...schedules];
+    fetchSchedules();
 
-    if (selectedDate) {
-      const selectedDateStr = selectedDate.toISOString().split('T')[0];
-      filtered = filtered.filter((schedule) => {
-        if (!schedule.date) return false;
-        const scheduleDate = new Date(schedule.date);
-        const scheduleDateStr = scheduleDate.toISOString().split('T')[0];
-        return scheduleDateStr === selectedDateStr;
-      });
+    return () => {
+        handleClear();
     }
+  }, []);
 
-    if (roomFilter) {
-      filtered = filtered.filter((schedule) =>
-        (schedule.room_id || "").toLowerCase().includes(roomFilter.toLowerCase())
+  const filteredSchedules = useMemo(() => {
+    return schedules.filter((schedule) => {
+      const matchesDate =
+        !selectedDate ||
+        new Date(schedule.usedDate).toDateString() ===
+          new Date(selectedDate).toDateString();
+
+      const matchesRoom = schedule.room_id
+        ?.toLowerCase()
+        .includes(roomFilter.toLowerCase());
+
+      const matchesLecturer = String(schedule.teacherId || "").includes(
+        lecturerFilter
       );
-    }
 
-    if (lecturerFilter) {
-      filtered = filtered.filter((schedule) => {
-        return String(schedule.teacherId || "").includes(lecturerFilter);
-      });
-    }
+      return (
+        matchesDate &&
+        (!roomFilter || matchesRoom) &&
+        (!lecturerFilter || matchesLecturer)
+      );
+    });
+  }, [schedules, selectedDate, roomFilter, lecturerFilter]);
 
-    setFilteredSchedules(filtered);
-  }, [selectedDate, roomFilter, lecturerFilter, schedules]);
-
-  if (!token) return null;
+  const formatHour = (hour) => {
+    const date = new Date();
+    date.setHours(hour, 0, 0, 0);
+    return date.toLocaleTimeString([], {
+      hour: "numeric",
+      hour12: true,
+    });
+  };
 
   return (
     <div className="schedule-list">
@@ -95,6 +104,10 @@ const ScheduleList = () => {
           onChange={(e) => setLecturerFilter(e.target.value)}
           size="small"
         />
+
+        <button className="filter-button" onClick={handleClear}>
+          <FilterListOffIcon className="filter-icon" />
+        </button>
       </div>
 
       {filteredSchedules.length === 0 ? (
@@ -102,21 +115,43 @@ const ScheduleList = () => {
           <h2>No schedules found!</h2>
         </div>
       ) : (
-        <Grid container spacing={2} justifyContent="center">
-          {filteredSchedules.map((schedule) => {
-            return (
-              <Grid item xs={12} sm={6} md={4} key={schedule._id || schedule.id}>
-                <div className="schedule-card">
-                  <h3>Room: {schedule.room_id || "-"}</h3>
-                  <p>Lecturer: {schedule.teacherId || "-"}</p>
-                  <p>Date: {schedule.date ? new Date(schedule.date).toLocaleDateString() : "-"}</p>
-                  <p>Time: {(schedule.startPeriod && schedule.endPeriod) ? `${schedule.startPeriod} - ${schedule.endPeriod}` : "-"}</p>
-                  <p>Lecture: {schedule.lectureTitle || "-"}</p>
-                </div>
-              </Grid>
-            );
-          })}
-        </Grid>
+        <div className="list-sched">
+          <Grid container spacing={2} justifyContent="center">
+            {filteredSchedules.map((schedule) => {
+              return (
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  key={schedule._id || schedule.id}
+                >
+                  <div className="schedule-card">
+                    <h3>Room: {schedule.room_id || "-"}</h3>
+                    <p>Lecturer ID: {schedule.teacherId || "-"}</p>
+                    <p>Lecturer Name: {schedule.teacher_name || "-"}</p>
+                    <p>
+                      Date:{" "}
+                      {schedule.date
+                        ? new Date(schedule.usedDate).toLocaleDateString()
+                        : "-"}
+                    </p>
+                    <p>
+                      Time:{" "}
+                      {schedule.startPeriod !== undefined &&
+                      schedule.endPeriod !== undefined
+                        ? `${formatHour(schedule.startPeriod)} - ${formatHour(
+                            schedule.endPeriod
+                          )}`
+                        : "-"}
+                    </p>
+                    <p>Lecture: {schedule.lectureTitle || "-"}</p>
+                  </div>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </div>
       )}
     </div>
   );
