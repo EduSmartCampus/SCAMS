@@ -45,24 +45,48 @@
     }
 
     .schedule-card {
-        background: white;
+        background: #eeddda;
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s;
+        transition: 0.3s ease all;
 
-        &:hover {
-            transform: translateY(-2px);
+        &:hover{
+        background-color: #d1c2bf;
+        animation: moveup 0.5s ease forwards;
+        cursor: pointer;
+        }
+
+        &:not(:hover) {
+            animation: movedown 0.5s ease forwards;
+        }
+
+        @keyframes moveup {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes movedown {
+            0% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0);
+            }
         }
 
         h3 {
             margin: 0 0 10px 0;
-            color: #1976d2;
+            // color: #1976d2;
         }
 
         p {
             margin: 5px 0;
-            color: #666;
+            // color: #666;
         }
     }
 
