@@ -1,7 +1,7 @@
 # Smart Campus Management System
 ## Installation
 **Frontend**
-* **Frontend Server:** React.js (with Vite.js for development)
+* **Frontend Server:** React.js + SCSS/SASS (with Vite.js for development)
 
 **How to Use**
 
