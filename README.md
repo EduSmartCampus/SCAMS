@@ -105,7 +105,7 @@ This section provides a high-level overview of the project's directory structure
 
 ## Installation
 
-*  **Smart Campus Backend**
+**Smart Campus Backend**
 
 **Project Structure**
 * **Backend Server:** Node.js (`node index.js`)
@@ -135,7 +135,7 @@ npm install
 * Step 4: Start the server
 node index.js
 
-** 	Connect with backup database
+**Connect with backup database**
 
 * Step 1: Open MySQL Workbench.
 
