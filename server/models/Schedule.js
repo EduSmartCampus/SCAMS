@@ -10,6 +10,7 @@ const scheduleSchema = new mongoose.Schema(
 		room_id: {
 			type: String,
 			required: true,
+			ref: 'Room'
 		},
 		date: {
 			type: Date,
@@ -29,7 +30,7 @@ const scheduleSchema = new mongoose.Schema(
 		},
 		teacherId: {
 			type: Number,
-			required: true,
+			required: true
 		},
 		lectureTitle: {
 			type: String,

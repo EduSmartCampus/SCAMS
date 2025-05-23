@@ -1,4 +1,5 @@
 const Schedule = require('../models/Schedule');
+const Lecturer = require('../models/Lecturer')
 const { v4: uuidv4 } = require('uuid');
 const {
   getAllSchedulesFromBackup,
@@ -8,6 +9,7 @@ const {
   deleteScheduleFromBackup
 } = require('../MySQL/schedule');
 const  {useBackupDB}  = require('../global');
+const { decrypt } = require('./auth.controller');
 
 const getAllSchedules = async (req, res) => {
   try {
@@ -24,8 +26,41 @@ const getAllSchedules = async (req, res) => {
     if (teacherId) filter.teacherId = teacherId;
     if (usedDate) filter.usedDate = usedDate;
 
-    const schedules = await Schedule.find(filter);
-    res.json(schedules);
+    const schedules = await Schedule.find(filter)
+                                    .populate({
+                                      path: "room_id",
+                                      select: "name",
+                                    });
+
+    const populatedSchedules = await Promise.all(
+      schedules.map(async (schedule) => {
+        const lecturer = await Lecturer.findOne({ id: schedule.teacherId }).select("name");
+        let teacherName = null;
+        if (lecturer?.name) {
+          try {
+            teacherName = decrypt(lecturer.name);
+          } catch (decryptErr) {
+            console.error(`Decryption error for lecturer id ${schedule.teacherId}:`, decryptErr);
+            teacherName = null;
+          }
+        }
+        return {
+          _id: schedule._id,
+          id: schedule.id,
+          room_id: schedule.room_id?._id || null,
+          room_name: schedule.room_id?.name || null,
+          date: schedule.date,
+          usedDate: schedule.usedDate,
+          startPeriod: schedule.startPeriod,
+          endPeriod: schedule.endPeriod,
+          teacherId: schedule.teacherId,
+          teacher_name: teacherName,
+          lectureTitle: schedule.lectureTitle,
+        };
+      })
+    );
+
+    res.json(populatedSchedules);
   } catch (err) {
     console.error("Error in getAllSchedules:", err);
     res.status(500).json({ message: "Error fetching schedules" });
@@ -40,13 +75,45 @@ const getScheduleById = async (req, res) => {
       if (!schedule) return res.status(404).json({ message: "Schedule not found" });
       return res.json(schedule);
     }
-    const schedule = await Schedule.findOne({ id: req.params.id });
+
+    const schedule = await Schedule.findOne({ id: req.params.id })
+      .populate('room_id', 'name');
+      
     if (!schedule) return res.status(404).json({ message: "Schedule not found" });
-    res.json(schedule);
+
+    const lecturer = await Lecturer.findOne({ id: schedule.teacherId }).select("name");
+
+    let teacherName = null;
+
+    if (lecturer?.name) {
+      try {
+        teacherName = decrypt(lecturer.name)
+      } catch (decryptErr) {
+        console.error(`Decryption error for lecturer id ${schedule.teacherId}:`, decryptErr);
+        teacherName = null;
+      }
+    }
+
+    const formattedSchedule = {
+      _id: schedule._id,
+      id: schedule.id,
+      room_id: schedule.room_id?._id || null,
+      room_name: schedule.room_id?.name || null,
+      date: schedule.date,
+      usedDate: schedule.usedDate,
+      startPeriod: schedule.startPeriod,
+      endPeriod: schedule.endPeriod,
+      teacherId: schedule.teacherId,
+      teacher_name: teacherName,
+      lectureTitle: schedule.lectureTitle,
+    };
+
+    res.json(formattedSchedule);
   } catch (err) {
     res.status(500).json({ message: "Error fetching schedule" });
   }
 };
+
 
 const createSchedule = async (req, res) => {
   try {
@@ -54,7 +121,7 @@ const createSchedule = async (req, res) => {
       return res.status(403).json({ message: "Only lecturers can create schedules" });
     }
 
-    const { room_id, usedDate, startPeriod, endPeriod, lectureTitle } = req.body;
+    const { room_id, usedDate, startPeriod, endPeriod, lectureTitle, teacherId } = req.body;
 
     // Check for overlapping schedule
     const hasOverlap = await isScheduleOverlapping({ room_id, usedDate, startPeriod, endPeriod });
@@ -71,7 +138,7 @@ const createSchedule = async (req, res) => {
       usedDate,
       startPeriod,
       endPeriod,
-      teacherId: req.user.id,
+      teacherId,
       lectureTitle,
     });
 
@@ -84,7 +151,7 @@ const createSchedule = async (req, res) => {
       usedDate,
       startPeriod,
       endPeriod,
-      teacherId: req.user.id,
+      teacherId,
       lectureTitle
     });
 
@@ -100,21 +167,22 @@ const updateSchedule = async (req, res) => {
     const scheduleId = req.params.id;
     const schedule = await Schedule.findOne( { id: scheduleId } );
 
-    if (!schedule) {
-      return res.status(404).json({ message: "Schedule not found" });
-    }
-
-    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId) {
-      return res.status(403).json({ message: "Not authorized to edit this schedule" });
-    }
-
     const {
       room_id,
       usedDate,
       startPeriod,
       endPeriod,
       lectureTitle,
+      teacherId
     } = req.body
+
+    if (!schedule) {
+      return res.status(404).json({ message: "Schedule not found" });
+    }
+
+    if (req.user.type !== 'lecturer' || teacherId !== schedule.teacherId) {
+      return res.status(403).json({ message: "Not authorized to edit this schedule" });
+    }
 
     // Check for overlapping schedule
     const hasOverlap = await isScheduleOverlapping({
@@ -124,6 +192,7 @@ const updateSchedule = async (req, res) => {
       endPeriod,
       excludeId: scheduleId,
     });
+
     if (hasOverlap) {
       return res.status(400).json({ message: "Schedule overlaps with existing schedule" });
     }
@@ -157,7 +226,9 @@ const deleteSchedule = async (req, res) => {
       return res.status(404).json({ message: "Schedule not found" });
     }
 
-    if (req.user.type !== 'lecturer' || req.user.id !== schedule.teacherId) {
+    const { teacherId } = req.body;
+
+    if (req.user.type !== 'lecturer' || teacherId !== schedule.teacherId) {
       return res.status(403).json({ message: "Not authorized to delete this schedule" });
     }
 

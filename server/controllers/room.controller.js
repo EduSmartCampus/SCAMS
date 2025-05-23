@@ -1,8 +1,10 @@
 // controllers/room.controller.js
 const Room = require("../models/Room");
 const Schedule = require("../models/Schedule");
+const Lecturer = require("../models/Lecturer");
 const { queryMysql } = require("../MySQL/test");
 const useBackupDB = require("../global");
+const { decrypt } = require("./auth.controller");
 
 // lấy tất cả rooms
 const getAllRooms = async (req, res) => {
@@ -52,7 +54,6 @@ const getRoomById = async (req, res) => {
 		const roomId = req.params.id;
 
 		if (useBackupDB.useBackupDB) {
-			// MySQL: dùng JOIN để lấy schedule có kèm tên phòng
 			const rooms = await queryMysql("SELECT * FROM rooms WHERE id = ?", [
 				roomId,
 			]);
@@ -62,38 +63,54 @@ const getRoomById = async (req, res) => {
 			const room = rooms[0];
 			room.devices = room.devices ? room.devices.split(",") : [];
 
-			// Join với bảng rooms để lấy room name
 			const schedules = await queryMysql(
 				`
-				SELECT s.*, r.name AS roomName
-				FROM schedules s
-				JOIN rooms r ON s.room_id = r.id
-				WHERE s.room_id = ?
-				ORDER BY s.date ASC, s.startPeriod ASC
-			`,
+		  SELECT s.*, r.name AS roomName, l.name AS teacher_name
+		  FROM schedules s
+		  JOIN rooms r ON s.room_id = r.id
+		  LEFT JOIN lecturers l ON s.teacherId = l.id
+		  WHERE s.room_id = ?
+		  ORDER BY s.date ASC, s.startPeriod ASC
+		  `,
 				[roomId]
 			);
 
 			return res.json({ room, schedules });
 		} else {
-			// MongoDB
 			const room = await Room.findOne({ _id: roomId });
 			if (!room)
 				return res.status(404).json({ message: "Không tìm thấy phòng" });
 
-			const schedules = await Schedule.find({ room_id: room._id }).sort({
+			const schedules = await Schedule.find({ room_id: roomId }).sort({
 				date: 1,
 			});
 
-			// Gắn room name vào từng schedule
-			const schedulesWithRoomName = schedules.map((s) => ({
+			const teacherIds = [...new Set(schedules.map((s) => s.teacherId))];
+
+			const lecturers = await Lecturer.find({ id: { $in: teacherIds } });
+
+			const lecturerMap = {};
+			for (const lec of lecturers) {
+				try {
+					lecturerMap[lec.id] = decrypt(lec.name);
+				} catch (err) {
+					console.warn(
+						`Decrypt failed for lecturer id ${lec.id}. Using plain name.`
+					);
+					lecturerMap[lec.id] = lec.name;
+				}
+			}
+
+			const schedulesWithInfo = schedules.map((s) => ({
 				...s.toObject(),
 				roomName: room.name,
+				teacher_name: lecturerMap[s.teacherId] || null,
 			}));
 
-			return res.json({ room, schedules: schedulesWithRoomName });
+			return res.json({ room, schedules: schedulesWithInfo });
 		}
 	} catch (err) {
+		console.error("Error in getRoomById:", err);
 		res.status(500).json({ message: "Lỗi server", error: err.message });
 	}
 };
