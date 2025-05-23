@@ -1,0 +1,13 @@
+.user-info-container {
+  height: 95vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+
+  .profile-card {
+    width: 100%;
+    max-width: 700px;
+  }
+}

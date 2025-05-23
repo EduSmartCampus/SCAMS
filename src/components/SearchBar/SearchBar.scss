@@ -1,0 +1,85 @@
+$border-color: #cccccc;
+$hover-color: #007bff;
+$border-radius: 8px;
+
+@mixin inputStyles {
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    padding: 5px;
+    outline: none;
+    font-size: 1rem;
+    transition: 0.2s ease all;
+
+    &:hover {
+        border-color: $hover-color;
+        cursor: pointer;
+    }
+}
+
+.filter-room {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        flex: 1;
+    
+        #room {
+            @include inputStyles;
+            text-align: center;
+            flex: 1;
+        }
+    
+        input {
+            flex: 1;
+        }
+    }
+
+    .filter-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        font-size: 1rem;
+        background: linear-gradient(to left, #0a75ad, #75acd5);
+        color: #fff;
+        padding: 7px 10px;
+        border-radius: 30px;
+        height: fit-content;
+        border: none;
+
+        .filter-icon {
+            border-radius: 20px;
+            width: 40px;
+            padding: 2px;
+            background-color: #fff;
+            color: #000;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    @media (max-width: 900px) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .filter-form {
+            width: 100%;
+        }
+
+        .filter-button {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 740px) {
+        .filter-form {
+            flex-direction: column;
+        }
+    }
+}
