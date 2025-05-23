@@ -1,111 +1,67 @@
-# Your Frontend Project Title (e.g., University Lecture Scheduling System Frontend)
-
-![Project Screenshot](link-to-your-screenshot.png) This project serves as the frontend application for [briefly describe what your project does, e.g., managing university lecture schedules, a student information portal, etc.]. Built with React and Vite, it leverages Material-UI (MUI) for a modern and responsive user interface, providing a smooth and intuitive user experience.
-
-## Table of Contents
-
-* [Features](#features)
-* [Technologies Used](#technologies-used)
-* [Folder Structure](#folder-structure)
-* [Installation](#installation)
-* [Usage](#usage)
-* [Available Scripts](#available-scripts)
-* [Configuration](#configuration)
-* [Contributing](#contributing)
-* [License](#license)
-* [Contact](#contact)
-
----
-
-## Features
-
-List the main functionalities or key features of your application.
-* **Dynamic Layout Management:** Utilizes a structured `Layout` system for consistent page presentation.
-* **Modular Component Design:** Reusable UI components built with Material-UI to ensure consistency and efficiency.
-* **State Management with Context API:** Employs React Context API for efficient global state management across the application.
-* **Page-Specific Functionality:** Dedicated pages for different sections of the application (e.g., schedule viewing, login, etc.).
-* **Utility Functions:** Includes a `Utils` module for common helper functions (e.g., authentication, data manipulation).
-* **Responsive UI:** Designed with Material-UI to adapt to various screen sizes, providing a seamless experience on desktop and mobile.
-* *(Add more specific features relevant to your project, e.g., "Lecturer schedule viewing," "Student course registration," etc.)*
-
----
-
-## Technologies Used
-
-This project was built using the following core technologies:
-
-* **React.js:** A JavaScript library for building user interfaces.
-* **Vite:** A lightning-fast build tool and development server for modern web projects.
-* **Material-UI (MUI):** A comprehensive suite of UI tools and components for building fast and beautiful React apps.
-    * `@mui/material`
-    * `@emotion/react`
-    * `@emotion/styled`
-    * `@mui/icons-material` (if you're using MUI icons)
-* **JavaScript (ES6+)**
-* **CSS** (as indicated by `App.css`, `Index.css`)
-
----
-
-## Folder Structure
-
-This section provides a high-level overview of the project's directory structure to help you navigate the codebase.
-
+# Smart Campus Management System
 ## Installation
-# Your Frontend Project Title (e.g., University Lecture Scheduling System Frontend)
+**Frontend**
+* **Frontend Server:** React.js (with Vite.js for development)
 
-![Project Screenshot](link-to-your-screenshot.png) This project serves as the frontend application for [briefly describe what your project does, e.g., managing university lecture schedules, a student information portal, etc.]. Built with React and Vite, it leverages Material-UI (MUI) for a modern and responsive user interface, providing a smooth and intuitive user experience.
+**How to Use**
 
-## Table of Contents
+Step 1. Install **Node Modules**
+* Installing node modules for frontend:
+```
+npm install
+```
 
-* [Features](#features)
-* [Technologies Used](#technologies-used)
-* [Folder Structure](#folder-structure)
-* [Installation](#installation)
-* [Usage](#usage)
-* [Available Scripts](#available-scripts)
-* [Configuration](#configuration)
-* [Contributing](#contributing)
-* [License](#license)
-* [Contact](#contact)
+Step 2. Install **React Router Dom**
+* Using **Router** for navigating between pages:
+```
+npm install react-router-dom
+```
 
----
+Step 3. Install **React Toastify**
+* Using **Toastify** for notifying messages:
+```
+npm install react-toastify
+```
 
-## Features
+Step 4. Install **React Big Calender**
+* Using **Big Calender** for showing schedule:
+```
+npm install react-big-calendar
+```
 
-List the main functionalities or key features of your application.
-* **Dynamic Layout Management:** Utilizes a structured `Layout` system for consistent page presentation.
-* **Modular Component Design:** Reusable UI components built with Material-UI to ensure consistency and efficiency.
-* **State Management with Context API:** Employs React Context API for efficient global state management across the application.
-* **Page-Specific Functionality:** Dedicated pages for different sections of the application (e.g., schedule viewing, login, etc.).
-* **Utility Functions:** Includes a `Utils` module for common helper functions (e.g., authentication, data manipulation).
-* **Responsive UI:** Designed with Material-UI to adapt to various screen sizes, providing a seamless experience on desktop and mobile.
-* *(Add more specific features relevant to your project, e.g., "Lecturer schedule viewing," "Student course registration," etc.)*
+Step 5. Install **Date FNS with locale support**
+* Using date tranfering to Vietnames time:
+```
+npm install date-fns
+```
 
----
+Step 6. Install **Axios**
+* Using axios for faster using **API** from backend:
+```
+npm install axios
+```
 
-## Technologies Used
+Step 7. Install **Material UI**
+* Using **MUI**:
+```
+npm install @mui/material @emotion/react @emotion/styled
+```
+* Using **MUI Icon**:
+```
+npm install @mui/icons-material
+```
+* Using **MUI Date Picker**:
+```
+npm install @mui/x-date-pickers
+```
 
-This project was built using the following core technologies:
+Step 8. Run Server
+* To run server with localhost address: `http://localhost:5173/` we will use:
+```
+npm run dev
+```
 
-* **React.js:** A JavaScript library for building user interfaces.
-* **Vite:** A lightning-fast build tool and development server for modern web projects.
-* **Material-UI (MUI):** A comprehensive suite of UI tools and components for building fast and beautiful React apps.
-    * `@mui/material`
-    * `@emotion/react`
-    * `@emotion/styled`
-    * `@mui/icons-material` (if you're using MUI icons)
-* **JavaScript (ES6+)**
-* **CSS** (as indicated by `App.css`, `Index.css`)
-
----
-
-## Folder Structure
-
-This section provides a high-level overview of the project's directory structure to help you navigate the codebase.
-
-## Installation
-
-**Smart Campus Backend**
+**Backend**
 
 **Project Structure**
 * **Backend Server:** Node.js (`node index.js`)
